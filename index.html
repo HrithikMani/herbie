@@ -65,8 +65,11 @@
       }
       .intro {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+      }
+      .intro .text-content {
+        flex: 1;
+        margin-right: 20px;
       }
       .intro #herbie-3d {
         width: 300px;
@@ -111,19 +114,22 @@
     </nav>
 
     <div class="wrapper">
-      <section class="intro">
-        <div>
+      <div class="row intro">
+        <div class="col-md-8 text-content">
           <h1>Herbie</h1>
           <p>Herbie is a Chrome extension designed to run automated tests without loading external software. It leverages a Behavior-Driven Development approach, allowing scripts to be written in a human-readable format.</p>
+          <h2>Features</h2>
+          <ul>
+            <li><strong>Behavior-Driven Development:</strong> Scripts are easy to understand and author.</li>
+            <li><strong>Interactive Inspector:</strong> Discover elements on a page effortlessly.</li>
+            <li><strong>mie-simulijs:</strong> Instead of using the jQuery Simulate Extended plug-in (a.k.a. jquery-simulate-ext) for simulating complex user interactions based on the jQuery.simulate() plug-in, we have used mie-simulijs, which was developed in MIE. It's a package that simulates events on the page. Here is the npm package: <a href="https://www.npmjs.com/package/mie-simulijs">mie-simulijs</a>.</li>
+          </ul>
         </div>
-        <div id="herbie-3d"></div>
-      </section>
-      <h2>Features</h2>
-      <ul>
-        <li><strong>Behavior-Driven Development:</strong> Scripts are easy to understand and author.</li>
-        <li><strong>Interactive Inspector:</strong> Discover elements on a page effortlessly.</li>
-        <li><strong>mie-simulijs:</strong> Instead of using the jQuery Simulate Extended plug-in (a.k.a. jquery-simulate-ext) for simulating complex user interactions based on the jQuery.simulate() plug-in, we have used mie-simulijs, which was developed in MIE. It's a package that simulates events on the page. Here is the npm package: <a href="https://www.npmjs.com/package/mie-simulijs">mie-simulijs</a>.</li>
-      </ul>
+        <div class="col-md-4">
+          <div id="herbie-3d"></div>
+        </div>
+      </div>
+  
       <h2>How to Install the Chrome Extension</h2>
       <ul>
         <li>Clone the project to your local machine or download the Chrome extension from the above link.</li>
@@ -181,15 +187,6 @@
       controls.enableZoom = false;
 
       let model;
-      let rotateModel = true;
-
-      controls.addEventListener('start', function () {
-        rotateModel = false;
-      });
-
-      controls.addEventListener('end', function () {
-        rotateModel = true;
-      });
 
       // Load the .glb model
       const loader = new THREE.GLTFLoader();
@@ -207,9 +204,6 @@
       // Animate the scene
       function animate() {
         requestAnimationFrame(animate);
-        if (model && rotateModel) {
-          model.rotation.y += 0.01; // Rotate the model
-        }
         controls.update();
         renderer.render(scene, camera);
       }
