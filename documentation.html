@@ -54,9 +54,25 @@
         background-color: #fff;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: flex;
       }
-      .navbar-brand img {
-        max-height: 40px;
+      .sidebar {
+        flex: 0 0 200px;
+        padding-right: 20px;
+      }
+      .sidebar ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+      .sidebar ul li {
+        margin-bottom: 10px;
+      }
+      .sidebar ul li a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .content {
+        flex: 1;
       }
       footer {
         margin-top: 40px;
@@ -96,98 +112,51 @@
     </nav>
 
     <div class="wrapper">
-      <section>
-        <h1>Documentation</h1>
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h3>Quick Navigation</h3>
+        <ul>
+          <li><a href="#documentation">Documentation</a></li>
+          <li><a href="#getting-started">Getting Started</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#modules">Modules</a></li>
+          <li><a href="#examples">Examples</a></li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <h1 id="documentation">Documentation</h1>
         <p>This section provides detailed documentation on how to use Herbie.</p>
         
-        <h2>Getting Started</h2>
+        <h2 id="getting-started">Getting Started</h2>
         <p>To get started with Herbie, follow these steps:</p>
         <ol>
           <li>Clone the project to your local machine or download the Chrome extension from the above link.</li>
           <li>Open Chrome and go to Preferences... -> Extensions.</li>
           <li>Ensure "Developer mode" is checked (upper left).</li>
           <li>Click "Load unpacked extension...".</li>
-          <li>Browse to the `chrome_extension` folder in the project.</li>
+          <li>Browse to the <code>chrome_extension</code> folder in the project.</li>
         </ol>
 
-        <h2>Features</h2>
+        <h2 id="features">Features</h2>
         <p>Herbie offers several key features:</p>
-        <ul>
-          <li><strong>Behavior-Driven Development:</strong> Scripts are easy to understand and author.</li>
-          <li><strong>Interactive Inspector:</strong> Discover elements on a page effortlessly.</li>
-          <li><strong>mie-simulijs:</strong> Instead of using the jQuery Simulate Extended plug-in (a.k.a. jquery-simulate-ext) for simulating complex user interactions based on the jQuery.simulate() plug-in, we have used mie-simulijs, which was developed in MIE. It's a package that simulates events on the page. Here is the npm package: <a href="https://www.npmjs.com/package/mie-simulijs">mie-simulijs</a>.</li>
-        </ul>
+        <!-- Add your feature content here -->
 
-        <h2>Modules</h2>
+        <h2 id="modules">Modules</h2>
         <p>Herbie is composed of several modules, each serving a specific purpose:</p>
+        <!-- Add your module content here -->
 
-        <h3>background.js</h3>
-        <p>This module handles the background operations and interactions with the Chrome API.</p>
-
-        <h3>commands.js</h3>
-        <p>This module defines the commands that Herbie can execute, such as click, type, and navigate.</p>
-
-        <h3>content.js</h3>
-        <p>This module interacts with the content of the web pages and handles script injections and event listeners.</p>
-
-        <h3>content-utils.js</h3>
-        <p>Utility functions used by content scripts to manipulate the DOM and handle events.</p>
-
-        <h3>Dragdrop.js</h3>
-        <p>This module simulates drag and drop events on web pages.</p>
-
-        <h3>ExecuteScript.js</h3>
-        <p>This module executes the generated scripts and simulates user interactions on the page.</p>
-
-        <h3>FindElement.js</h3>
-        <p>This module includes functions to locate and interact with DOM elements based on various criteria.</p>
-
-        <h3>keywords.js</h3>
-        <p>This module defines the keywords used in the Behavior-Driven Development scripts.</p>
-
-        <h3>logs.js</h3>
-        <p>This module handles logging of actions and results for debugging and review purposes.</p>
-
-        <h3>main.js</h3>
-        <p>The main entry point for the Herbie extension, initializing and managing the overall workflow.</p>
-
-        <h3>parser.js</h3>
-        <p>This module parses the BDD scripts and translates them into executable commands.</p>
-
-        <h3>record.js</h3>
-        <p>This module records user interactions on the page to generate BDD scripts.</p>
-
-        <h3>scripts.js</h3>
-        <p>This module manages the execution of scripts within the Herbie extension.</p>
-
-        <h3>utils.js</h3>
-        <p>Utility functions used across different modules to perform common tasks.</p>
-
-        <h2>Examples</h2>
+        <h2 id="examples">Examples</h2>
         <p>Here are some examples of how to use Herbie:</p>
-        <h3>Example 1: Click an Element</h3>
-        <pre><code>
-        // BDD Script to click an element
-        Given the user is on the homepage
-        When the user clicks the "Login" button
-        Then the login form should be displayed
-        </code></pre>
-
-        <h3>Example 2: Fill a Form</h3>
-        <pre><code>
-        // BDD Script to fill out a form
-        Given the user is on the signup page
-        When the user enters "John Doe" into the "Name" field
-        And the user enters "john.doe@example.com" into the "Email" field
-        And the user clicks the "Submit" button
-        Then the signup confirmation message should be displayed
-        </code></pre>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/mieweb">mieweb</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+        <!-- Add your examples here -->
+      </div>
     </div>
+
+    <footer>
+      <p>This project is maintained by <a href="https://github.com/mieweb">mieweb</a></p>
+      <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </footer>
 
     <!-- Bootstrap and jQuery JavaScript CDN -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
