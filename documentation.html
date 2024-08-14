@@ -145,10 +145,40 @@
         <!-- Add content related to the Herbie tab here -->
         <p>Herbie is a powerful Chrome extension designed to automate and test web interactions seamlessly. It leverages Behavior-Driven Development (BDD) principles, making it accessible for both developers and non-developers to write and understand test scripts.</p>
 
-        <h2 id="keywords">Keywords</h2>
-        <!-- Add content related to the Keywords tab here -->
 
-        <h2 id="saved-scripts">Saved Scripts</h2>
+<h3>Click</h3>
+<p>The <code>click</code> command is used to simulate a mouse click on a specified element. You can define an XPath, class, or ID for the element you want to interact with, and use this keyword in your scripts. For example:</p>
+<pre><code>click on "//*[@id='submit-button']"</code></pre>
+<p>This command will click on the element with the ID 'submit-button'. Alternatively, you can pass a class:</p>
+<pre><code>click on "//*[@class='button-class']"</code></pre>
+<p>This command will click on the first element with the class 'button-class'.</p>
+
+<h3>Type</h3>
+<p>The <code>type</code> command is used to simulate typing text into an input field. You specify the text to be typed and the target element's XPath, class, or ID. For example:</p>
+<pre><code>type "Hello, World!" in "//*[@id='text-input']"</code></pre>
+<p>This command will type "Hello, World!" into the input field with the ID 'text-input'. You can also target an element by class:</p>
+<pre><code>type "Hello, World!" in "//*[@class='input-class']"</code></pre>
+<p>This command will type "Hello, World!" into the first input field with the class 'input-class'.</p>
+
+<h3>Wait</h3>
+<p>The <code>wait</code> command pauses the script execution for a specified amount of time, which is useful for handling asynchronous operations on the webpage. For example:</p>
+<pre><code>wait 5000</code></pre>
+<p>This command will pause the script for 5000 milliseconds (5 seconds) before proceeding to the next command.</p>
+
+<h3>Verify</h3>
+<p>The <code>verify</code> command is used to check if a particular text is present in a specified element on the page. You can use XPath, class, or ID selectors to define the target element. If the text is not found, the script will stop execution. For example:</p>
+<pre><code>verify "Success" in "//*[@id='message']"</code></pre>
+<p>This command will verify that the text "Success" is present in the element with the ID 'message'. You can also target an element by class:</p>
+<pre><code>verify "Success" in "//*[@class='message-class']"</code></pre>
+<p>This command will verify that the text "Success" is present in the first element with the class 'message-class'. If the text is not found, an error is logged and the script stops.</p>
+
+<p>You can manage these keywords and more within the "Keywords" tab of the Herbie extension interface. This flexibility allows you to target elements using a variety of selectors, making your scripts more adaptable to different web page structures.</p>
+
+
+<h2 id="keywords">Keywords</h2>
+<p>Herbie allows you to define and manage custom keywords for dynamic XPath expressions. Keywords can be used to simplify the process of targeting elements on a webpage. You can pass class names, IDs, or other attributes directly into these commands. The following are some of the key commands supported by Herbie:</p>
+        
+<h2 id="saved-scripts">Saved Scripts</h2>
         <!-- Add content related to the Saved Scripts tab here -->
 
         <h2 id="logs">Logs</h2>
