@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+http://mieweb.github.io/herbie/
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Herbie
+======
 
-## Available Scripts
+Herbie is a set of tools for developing BDD (https://en.wikipedia.org/wiki/Behavior-driven_development) scripts for testing.  The premise is that the scripts should be human understandable and author-able.
 
-In the project directory, you can run:
+There are several different components to Herbie:
 
-### `npm start`
+1. An English like language parser specifically for understanding documentation like directives: Vision.
+2. An interactive inspector to make it easier for Vision authors to discover what elements are on a page.
+3. A simple Vision interpreter that allow an author to test/debug Vision script. 
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Simulating User Interactions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Instead of using the jQuery Simulate Extended plug-in (a.k.a. jquery-simulate-ext) for simulating complex user interactions based on the [jQuery.simulate()](https://github.com/jquery/jquery-simulate) plug-in, we have used `mie-simulijs`, which was developed in MIE. It's a package that simulates events on the page. Here is the npm package: [mie-simulijs](https://www.npmjs.com/package/mie-simulijs).
 
-### `npm test`
+We made this change because the jQuery Simulate package was not being maintained, and some events like mouseover and mouseenter were not working as expected. To overcome this, we had to build our own package. Feel free to check out the package.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# How to Install the Chrome Extension
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the project to your local machine or download the chrome extension from above link.
+2. Open Chrome and go to `Preferences... -> Extensions`.
+3. Ensure "Developer mode" is checked (upper left).
+4. Click "Load unpacked extension...".
+5. Browse to the `chrome_extension` folder in the project.
 
-### `npm run eject`
+Voila! Now a Herbie robot button should exist on the toolbar. It will inject Herbie into the background of the current tab of any webpage.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Initial Herbie
+----
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Feel free to check out Herbie, which was written in jQuery in 2015. This was one of the first versions.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+An online demo is available here: [Herbie Demo](http://mieweb.github.io/herbie/demo/index.html#run_herbie)
 
-## Learn More
+![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_movie.gif)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+About
+-----
+Through a fault in manufacturing, a robot, RB-34 (a.k.a. Herbie), is created that possesses telepathic abilities. https://en.wikipedia.org/wiki/Liar!_(short_story)
 
-### Code Splitting
+References
+----------
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Inspiration has been drawn from:
+* [Gherkin](https://github.com/cucumber/cucumber/wiki/Gherkin) and [Cucumber](https://cukes.info/) but Vision has a slightly different goals.
+* [Sikuli Script](http://www.sikuli.org/) tho specific to the web, and mean to be browser independant.
+* [DalekJS](http://dalekjs.com/pages/documentation.html)
+* [Nightwatch.js](http://nightwatchjs.org/)
+* [Selenium Web Driver](https://code.google.com/p/selenium/wiki/JsonWireProtocol) of course.
+* For recording [xss-keylogger](https://github.com/hadynz/xss-keylogger)
+* [Chrome Extension Examples](https://developer.chrome.com/extensions/samples#search:webnavigation.oncommitted)
+* [Mozilla FireFox Extension](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Modifying_the_Page_Hosted_by_a_Tab)
+* [Safari Extension Developer](https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html)
+* [Developing Internet Explorer Extensions](http://stackoverflow.com/questions/5643819/developing-internet-explorer-extensions)

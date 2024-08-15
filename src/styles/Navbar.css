@@ -1,0 +1,82 @@
+/* Style for the entire navbar */
+#main-navbar {
+    background-color: #f8f9fa; /* Light background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    padding: 10px 20px;
+    margin-bottom: 20px;
+  }
+  
+  /* Style for the brand logo */
+  #navbar-brand {
+    display: flex;
+    align-items: center; /* Align brand logo and text in the center vertically */
+  }
+  
+  #navbar-brand img {
+    height: 40px;
+    max-width: 100%;
+    transition: transform 0.3s ease;
+    margin-right: 10px; /* Add some space between the logo and brand name if needed */
+  }
+  
+  #navbar-brand img:hover {
+    transform: scale(1.1); /* Slightly enlarge the logo on hover */
+  }
+  
+  /* Style for the toggler button */
+  #navbar-toggler {
+    border: none;
+  }
+  
+  /* Style for the navbar links */
+  #navbar-links {
+    display: flex; 
+    margin-left: 0; 
+    list-style-type: none; 
+    padding-left: 0; 
+    position: relative;
+    top:10px;
+  }
+  
+  #navbar-links .nav-link {
+    font-weight: 500;
+    padding: 10px 15px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none; /* Remove text decoration (underline) */
+  }
+  
+  #navbar-links .nav-link:hover {
+    background-color: #007bff;
+    color: #fff; /* White text on hover */
+    border-radius: 4px;
+    text-decoration: none; /* Ensure no underline on hover */
+  }
+  
+  /* Specific styles for individual nav items */
+  #nav-item-home .nav-link {
+    color: #6c757d; /* Custom color for the Home link */
+  }
+  
+  #nav-item-documentation .nav-link {
+    color: #6c757d; /* Custom color for the Documentation link */
+  }
+  
+  #nav-item-github .nav-link {
+    color: #6c757d; /* Custom color for the GitHub link */
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 992px) {
+    #navbar-links {
+      margin-left: 0; /* Reset margin for mobile */
+      flex-direction: column; /* Stack links vertically on small screens */
+    }
+    
+    #navbar-links .nav-link {
+      padding: 10px;
+      text-align: center;
+    }
+  }
+  
