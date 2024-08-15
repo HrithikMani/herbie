@@ -1,6 +1,6 @@
 {
   "homepage": "https://hrithikmani.github.io/herbie/",
-  "name": "docs",
+  "name": "herbie_documentation",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -38,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "mvdir": "^1.0.22"
   }
 }
