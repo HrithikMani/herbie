@@ -1,17 +1,18 @@
 {
   "files": {
-    "main.css": "/herbie/static/css/main.e195a9c1.css",
-    "main.js": "/herbie/static/js/main.1aed2e9a.js",
+    "main.css": "/herbie/static/css/main.e2973789.css",
+    "main.js": "/herbie/static/js/main.d08518b7.js",
     "static/js/453.320a8d66.chunk.js": "/herbie/static/js/453.320a8d66.chunk.js",
+    "static/media/sc2.png": "/herbie/static/media/sc2.a3e6fe0b8aed877fa65e.png",
     "static/media/herbie128.png": "/herbie/static/media/herbie128.8ecb8191c7adf562c853.png",
     "static/media/sc1.png": "/herbie/static/media/sc1.17ef6b9ece68929450a4.png",
     "index.html": "/herbie/index.html",
-    "main.e195a9c1.css.map": "/herbie/static/css/main.e195a9c1.css.map",
-    "main.1aed2e9a.js.map": "/herbie/static/js/main.1aed2e9a.js.map",
+    "main.e2973789.css.map": "/herbie/static/css/main.e2973789.css.map",
+    "main.d08518b7.js.map": "/herbie/static/js/main.d08518b7.js.map",
     "453.320a8d66.chunk.js.map": "/herbie/static/js/453.320a8d66.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e195a9c1.css",
-    "static/js/main.1aed2e9a.js"
+    "static/css/main.e2973789.css",
+    "static/js/main.d08518b7.js"
   ]
 }

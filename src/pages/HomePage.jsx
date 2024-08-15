@@ -23,6 +23,7 @@ const HomePage = () => {
       </div>
   
       <h2>How to Install the Chrome Extension</h2>
+      <a href="https://github.com/HrithikMani/herbie/archive/refs/tags/0.3.zip">Download Link</a>
       <ul>
         <li>Clone the project to your local machine or download the Chrome extension from the above link.</li>
         <li>Open Chrome and go to Preferences...  Extensions.</li>

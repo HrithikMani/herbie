@@ -82,3 +82,6 @@ footer a {
 footer a:hover {
   color: #007bff;
 }
+*{
+  font-size: 14px;
+}
