@@ -10,9 +10,9 @@ const Sidebar = () => {
         <SidebarItem href="#getting-started">Getting Started</SidebarItem>
         <SidebarItem href="#herbie">Herbie</SidebarItem>
         <SidebarItem href="#keywords">Keywords</SidebarItem>
+        <SidebarItem href="#record">Record</SidebarItem>
         <SidebarItem href="#saved-scripts">Saved Scripts</SidebarItem>
         <SidebarItem href="#logs">Logs</SidebarItem>
-        <SidebarItem href="#record">Record</SidebarItem>
       </ul>
     </div>
   );

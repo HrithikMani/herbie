@@ -1,86 +1,84 @@
 body {
-    padding: 20px;
-    font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #777;
-    font-weight: 300;
-    background-color: #f8f9fa;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: #222;
-    margin: 20px 0;
-  }
-  
-  p, ul, ol, table, pre, dl {
-    margin: 0 0 20px;
-  }
-  
-  h1, h2, h3 {
-    line-height: 1.1;
-  }
-  
-  h1 {
-    font-size: 28px;
-  }
-  
-  h2 {
-    font-size: 24px;
-    color: #393939;
-  }
-  
-  h3, h4, h5, h6 {
-    color: #494949;
-  }
-  
-  a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  a:hover {
-    text-decoration: underline;
-  }
-  
-  .wrapper {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
- 
-  .intro {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .intro .text-content {
-    flex: 1;
-    margin-right: 20px;
-  }
-  
-  .intro #herbie-3d {
-    width: 300px;
-    height: 300px;
-    background-color: #fff;
-    position: relative;
-    top: 20%;
-    left: 5%;
-  }
-  
-  footer {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 14px;
-  }
-  
-  footer a {
-    color: #777;
-  }
-  
-  footer a:hover {
-    color: #007bff;
-  }
-  
+  padding: 20px;
+  font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #777;
+  font-weight: 300;
+  background-color: #f8f9fa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #222;
+  margin: 20px 0;
+}
+
+p, ul, ol, table, pre, dl {
+  margin: 0 0 20px;
+}
+
+h1, h2, h3 {
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h2 {
+  font-size: 24px;
+  color: #393939;
+}
+
+h3, h4, h5, h6 {
+  color: #494949;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Ensure vertical alignment */
+}
+
+.intro .text-content {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.intro #herbie-3d {
+  width: 300px;
+  height: 300px;
+  background-color: #fff;
+  position: relative;
+  margin-left: auto; /* Aligns the image to the right */
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
+}
+
+footer a {
+  color: #777;
+}
+
+footer a:hover {
+  color: #007bff;
+}

@@ -3,6 +3,7 @@ import GettingStarted from './sections/GettingStarted';
 import Herbie from './sections/Herbie';
 import Sidebar from './sections/SideBar';
 import '../styles/Documentation.css';
+import KeywordDoc from './sections/KeywordDoc';
 const Documentation = () => {
   return (
     <>
@@ -15,6 +16,7 @@ const Documentation = () => {
 
           <GettingStarted />
           <Herbie />
+          <KeywordDoc />
         </div>
       </div>
 
