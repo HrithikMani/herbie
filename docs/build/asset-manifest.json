@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/herbie/static/css/main.dd4bfb03.css",
+    "main.js": "/herbie/static/js/main.06dc522c.js",
+    "static/js/453.320a8d66.chunk.js": "/herbie/static/js/453.320a8d66.chunk.js",
+    "static/media/herbie128.png": "/herbie/static/media/herbie128.8ecb8191c7adf562c853.png",
+    "index.html": "/herbie/index.html",
+    "main.dd4bfb03.css.map": "/herbie/static/css/main.dd4bfb03.css.map",
+    "main.06dc522c.js.map": "/herbie/static/js/main.06dc522c.js.map",
+    "453.320a8d66.chunk.js.map": "/herbie/static/js/453.320a8d66.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dd4bfb03.css",
+    "static/js/main.06dc522c.js"
+  ]
+}
