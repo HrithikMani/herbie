@@ -8,7 +8,7 @@ const HomePage = () => {
     <div className="wrapper">
       <div className="row intro">
         <div className="col-md-8 text-content">
-          <h1>Herbie</h1>
+          <h1>Herbie Test</h1>
           <p>Herbie is a Chrome extension designed to run automated tests without loading external software. It leverages a Behavior-Driven Development approach, allowing scripts to be written in a human-readable format.</p>
           <h2>Features</h2>
           <ul>
