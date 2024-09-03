@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('keyword-xpath').value = result.saved_xpath;
         }
     });
+    const searchInput = document.getElementById('search-keyword');
+    searchInput.addEventListener('input', filterKeywords);
 
     document.getElementById('inspect-element').addEventListener('click', startInspecting);
     document.getElementById('add-keyword').addEventListener('click', addKeyword);
@@ -24,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('XPath value saved on close:', currentValue);
         });
     });
+   
 });
 
 function startInspecting() {
@@ -229,4 +232,35 @@ function processImportedKeywords(keywords) {
             loadKeywords();
         });
     });
+}
+function filterKeywords() {
+    const filterValue = document.getElementById('search-keyword').value.toLowerCase();
+    const keywordItems = document.querySelectorAll('#global-keywords-list .keyword-item');
+    let hasMatch = false;
+
+    keywordItems.forEach(item => {
+        const keywordName = item.querySelector('.keyword-name').textContent.toLowerCase();
+        if (keywordName.includes(filterValue)) {
+            item.style.display = '';
+            hasMatch = true;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    const noMatchMessage = document.getElementById('no-keywords-message');
+    if (!hasMatch) {
+        if (!noMatchMessage) {
+            const message = document.createElement('p');
+            message.id = 'no-keywords-message';
+            message.textContent = 'No keywords found';
+            message.style.color = '#888';
+            message.style.textAlign = 'center';
+            document.getElementById('global-keywords-container').appendChild(message);
+        }
+    } else {
+        if (noMatchMessage) {
+            noMatchMessage.remove();
+        }
+    }
 }
