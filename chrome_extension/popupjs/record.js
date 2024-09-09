@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
+    const recordVerifyButton = document.getElementById('record_verify');
+
+
     const recordClickButton = document.getElementById('record_click');
     const recordTypeButton = document.getElementById('record_type');
     const fetchActionsButton = document.getElementById('fetch_actions');
@@ -12,6 +15,7 @@ function setupEventListeners() {
     const saveActionsButton = document.getElementById('save_actions');
     recordClickButton.addEventListener('dragstart', handleDragStart.bind(null, 'click'));
     recordTypeButton.addEventListener('dragstart', handleDragStart.bind(null, 'type'));
+    recordVerifyButton.addEventListener('dragstart', handleDragStart.bind(null, 'verify'));
     //fetchActionsButton.addEventListener('click', fetchAndDisplayActions);
     clearActionsButton.addEventListener('click', clearActions);
     recordRunButton.addEventListener('click', runActions);

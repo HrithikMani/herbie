@@ -21,20 +21,19 @@ function handleDragLeave(event) {
 async function handleDrop(event) {
     event.preventDefault();
     const data = event.dataTransfer.getData('text/plain');
-
+  
     if (data === 'click') {
-        await handleDropClick(event);
+      await handleDropClick(event);
     } else if (data === 'type' && isInputOrTextarea(event.target)) {
-        await handleDropType(event);
+      await handleDropType(event);
+    } else if (data === 'verify') {
+      await handleDropVerify(event);
     } else {
-        console.log('Dropped on a non-highlightable element:', event.target);
+      console.log('Dropped on a non-highlightable element:', event.target);
     }
-
-    // Ensure the border remains after the drop
-    if (data === 'click') {
-        event.target.style.border = '2px dashed red';
-    } else if (data === 'type' && isInputOrTextarea(event.target)) {
-        event.target.style.border = '2px dashed blue';
+  
+    if (data === 'verify') {
+      event.target.style.border = '2px dashed green';
     }
 }
 
@@ -204,3 +203,32 @@ async function addActionToStorage(command) {
 
     console.log('Actions updated and saved to Chrome storage:', actions);
 }
+async function handleDropVerify(event) {
+    console.log('Dropped verify on:', event.target);
+  
+    // Capture the XPath or selector for the element
+    const xpath = getElementXPath(event.target);
+  
+    // Ask the user for the text they want to verify
+    const verifyText = prompt('Enter the text to verify in this element:', 'Hrithik');
+  
+    if (verifyText) {
+      const command = {
+        line: 0,  // This will be updated when saving actions
+        code: ["verify", `"${verifyText}"`, "in", `"${xpath}"`],
+        src: `verify "${verifyText}" in "${xpath}"`,
+        timeout: 5000,
+        subcommands: []
+      };
+  
+      // Add the command to storage
+      await addActionToStorage(command);
+  
+      // Provide visual feedback
+      event.target.style.border = '2px dashed green';
+    } else {
+      alert('Please enter valid text for verification.');
+    }
+  }
+  
+  
