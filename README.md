@@ -98,6 +98,3 @@ Ensure the following are installed before starting:
 
 Modify the `docusaurus.config.js` and `sidebars.js` files to customize the sidebar, theme, or other settings.
 
-## License
-
-This project is licensed under the MIT License.
