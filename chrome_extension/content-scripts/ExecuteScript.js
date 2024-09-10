@@ -1,7 +1,4 @@
 var stopScript = false;
-chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-    stopScript=true;
-  });
 function ExecuteScript() {
     var cmdtree = arguments[0], options = { line: 0, delay: 100, cmdtree: cmdtree }, callback, tag = [];
     if (arguments.length === 2) {
