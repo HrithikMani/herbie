@@ -210,7 +210,7 @@ async function handleDropVerify(event) {
     const xpath = getElementXPath(event.target);
   
     // Ask the user for the text they want to verify
-    const verifyText = prompt('Enter the text to verify in this element:', 'Hrithik');
+    const verifyText = prompt('Enter the text to verify in this element:', '');
   
     if (verifyText) {
       const command = {
@@ -230,5 +230,4 @@ async function handleDropVerify(event) {
       alert('Please enter valid text for verification.');
     }
   }
-  
   

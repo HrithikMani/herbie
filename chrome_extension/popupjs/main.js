@@ -12,6 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(activeTab).classList.add('active');
         }
     });
+ 
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Toggle the display of the dropdown menu on click
+        dropdownToggle.addEventListener('click', () => {
+        dropdownMenu.parentElement.classList.toggle('show');
+        });
 
     // Event listeners for command buttons
     document.getElementById('herbie_parse').addEventListener('click', parseCommand);
@@ -90,9 +98,38 @@ document.addEventListener('DOMContentLoaded', () => {
             this.selectionStart = this.selectionEnd = start + tabCharacter.length;
         }
     });
+    
+   // Select all dropdown items and add click event listeners
+document.querySelectorAll('.dropdown-item').forEach((item) => {
+    item.addEventListener('click', function () {
+      // Hide the dropdown after selecting an option
+      dropdownMenu.parentElement.classList.remove('show');
+  
+      // Remove 'active' class from all tab contents
+      document.querySelectorAll('.tab-content').forEach((content) => {
+        content.classList.remove('active');
+      });
+  
+      // Add 'active' class to the selected tab content
+      const selectedTab = this.getAttribute('data-tab');
+      document.querySelector(`#${selectedTab}`).classList.add('active');
+  
+      // Execute functions based on the selected tab
+      if (selectedTab === 'tab2') {
+        loadLogs();
+      } else if (selectedTab === 'tab3') {
+        loadSavedScripts();
+      } else if (selectedTab === 'tab5') {
+        fetchAndDisplayActions();
+      }
+    });
+  });
+  
 
     loadKeywords();
     loadLogs();
     loadSavedScripts();
     fetchAndDisplayActions();
 });
+
+

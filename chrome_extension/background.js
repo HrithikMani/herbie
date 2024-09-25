@@ -4,6 +4,9 @@ var cmdtree = [];
 let currentLine = 0;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  
+    
+
     if (message.action === 'parse') {
         const scriptContent = message.data;
 
@@ -27,7 +30,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
         });
 
-        return true; // Keep the messaging channel open for asynchronous responses
     }
 
     if (message.action === 'RUN') {
@@ -64,7 +66,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
         });
 
-        return true; // Keep the messaging channel open for asynchronous responses
     }
 
     if (message.action === 'actions_run') {
@@ -96,6 +97,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.runtime.sendMessage({ action: 'progress', current: currentLine, total: cmdtree.length });
         sendResponse({ status: 'success', data: "log received" });
     }
+
 
     return true; // Keep the messaging channel open for asynchronous responses
 });

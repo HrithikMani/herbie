@@ -10,13 +10,22 @@
 </head>
 <body>
   
-  <div class="tab-container">
-    <button class="tab-button active" data-tab="tab1">Herbie</button>
-    <button class="tab-button" data-tab="tab4">Keywords</button>
-    <button class="tab-button" data-tab="tab5">Record</button>
-    <button class="tab-button" data-tab="tab3">Saved Scripts</button>
-    <button class="tab-button" data-tab="tab2">Logs</button>
+  <div class="dropdown-container">
+    <div class="dropdown">
+      <button class="dropdown-toggle" aria-label="Menu">
+       
+        <span class="hamburger-icon">&#9776;</span>
+      </button>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" data-tab="tab1">Herbie</button>
+        <button class="dropdown-item" data-tab="tab4">Keywords</button>
+        <button class="dropdown-item" data-tab="tab5">Record</button>
+        <button class="dropdown-item" data-tab="tab3">Saved Scripts</button>
+        <button class="dropdown-item" data-tab="tab2">Logs</button>
+      </div>
+    </div>
   </div>
+  
   <div id="tab1" class="tab-content active">
     <div id="herbie_div">
       <div id="herbie_buttons">
@@ -135,6 +144,7 @@
       <button id="record_type" class="record-button record-type" aria-label="Record Type" draggable="true">
         <i class="fas fa-keyboard"></i> Type
       </button>
+      
       <div class="record-row">
         <button id="record_verify" class="record-button record-verify" aria-label="Record Verify" draggable="true">
           <i class="fas fa-check"></i> Verify

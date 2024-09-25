@@ -6,8 +6,7 @@ body {
   }
   
   #herbie_div {
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
+  
     border-radius: 8px;
     padding: 10px;
     box-sizing: border-box;
@@ -562,7 +561,7 @@ body {
 /* Styles for the Record tab */
 .record-tab {
   padding: 20px;
-  background-color: #f4f4f4; /* Light grey background for better contrast */
+ 
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -947,4 +946,62 @@ ul {
   border-color: #007bff; /* Blue border on focus */
   outline: none; /* Remove default focus outline */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Subtle shadow on focus */
+}
+
+
+.dropdown-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns the dropdown to the right */
+  background-color: white;
+
+}
+
+/* Style for the dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Style for the hamburger icon */
+.hamburger-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Dropdown menu hidden by default */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0; /* Aligns the dropdown items to the right */
+  background-color: white;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  min-width: 150px;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+/* Style for dropdown items */
+.dropdown-item {
+  padding: 8px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for dropdown items */
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Show dropdown when clicked */
+.dropdown.show .dropdown-menu {
+  display: block;
+}
+.dropdown-toggle{
+  background: white;
+  border: none;
 }
