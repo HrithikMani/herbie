@@ -28,7 +28,9 @@
       "resources": [
         "dist/*",
         "herbie/*",
-        "*.png"
+        "*.png",
+        "walkthrough.html",
+        "walkthrough.js"
   
       ],
       "matches": ["<all_urls>"]

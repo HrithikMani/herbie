@@ -130,3 +130,10 @@ function sendMessageWithRetry(tabId, data, line, retries = 5) {
         }
     });
 }
+
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === "install") {
+        // First-time install detected, set walkthrough flag
+        chrome.storage.local.set({ walkthroughCompleted: false });
+    }
+});
