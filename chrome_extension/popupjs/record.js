@@ -13,9 +13,11 @@ function setupEventListeners() {
     const recordRunButton = document.getElementById('record_run');
     const recordWaitButton = document.getElementById('record_wait');
     const saveActionsButton = document.getElementById('save_actions');
+
     recordClickButton.addEventListener('dragstart', handleDragStart.bind(null, 'click'));
     recordTypeButton.addEventListener('dragstart', handleDragStart.bind(null, 'type'));
     recordVerifyButton.addEventListener('dragstart', handleDragStart.bind(null, 'verify'));
+    
     //fetchActionsButton.addEventListener('click', fetchAndDisplayActions);
     clearActionsButton.addEventListener('click', clearActions);
     recordRunButton.addEventListener('click', runActions);
@@ -58,9 +60,22 @@ function saveActions() {
 }
 
 function handleDragStart(actionType, event) {
-    event.dataTransfer.setData('text/plain', actionType);
-    event.dataTransfer.effectAllowed = 'move';
-}
+       // Log the current window height for reference
+       console.log('Current window height:', window.innerHeight);
+
+       // Set the drag event data
+       event.dataTransfer.setData('text/plain', actionType);
+       event.dataTransfer.effectAllowed = 'move';
+   
+       // Resize the window when dragging starts
+       const newHeight = 300; // Example new height, set this to your desired value
+       const newWidth = window.innerWidth; // Keep the current width
+   
+       window.resizeTo(newWidth, newHeight); // Resize the popup to the new dimensions
+   
+       console.log('New window height after resize:', window.innerHeight);
+  }
+  
 
 function fetchAndDisplayActions() {
     chrome.storage.local.get(['actions'], (result) => {

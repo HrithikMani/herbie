@@ -10,18 +10,27 @@
 </head>
 <body>
   
-  <div class="tab-container">
-    <button class="tab-button active" data-tab="tab1">Herbie</button>
-    <button class="tab-button" data-tab="tab4">Keywords</button>
-    <button class="tab-button" data-tab="tab5">Record</button>
-    <button class="tab-button" data-tab="tab3">Saved Scripts</button>
-    <button class="tab-button" data-tab="tab2">Logs</button>
+  <div class="dropdown-container">
+    <div class="dropdown" id="dropdown">
+      <button class="dropdown-toggle" aria-label="Menu">
+       
+        <span class="hamburger-icon">&#9776;</span>
+      </button>
+      <div class="dropdown-menu" >
+        <button class="dropdown-item" data-tab="tab1">Herbie</button>
+        <button class="dropdown-item" data-tab="tab4">Keywords</button>
+        <button class="dropdown-item" data-tab="tab5">Record</button>
+        <button class="dropdown-item" data-tab="tab3">Saved Scripts</button>
+        <button class="dropdown-item" data-tab="tab2">Logs</button>
+      </div>
+    </div>
   </div>
+  
   <div id="tab1" class="tab-content active">
     <div id="herbie_div">
       <div id="herbie_buttons">
         <img id="herbie_logo" align="left" src="logos/herbie48.png" alt="Herbie Logo" height="30" style="padding-top: 2px; padding-left: 4px;">
-        <span><a target="_blank" href="http://mieweb.github.io/herbie/">Herbie</a></span>
+        <span id="herbie_documentation"><a  target="_blank" href="http://mieweb.github.io/herbie/">Herbie</a></span>
         
         <button id="herbie_run" title="Run" class="run-button" aria-label="Run Herbie">
           <i class="fas fa-play"></i>
@@ -135,6 +144,7 @@
       <button id="record_type" class="record-button record-type" aria-label="Record Type" draggable="true">
         <i class="fas fa-keyboard"></i> Type
       </button>
+      
       <div class="record-row">
         <button id="record_verify" class="record-button record-verify" aria-label="Record Verify" draggable="true">
           <i class="fas fa-check"></i> Verify
@@ -169,6 +179,14 @@
   </div>
 </div>
 
+<div id="walkthrough-overlay">
+  <div id="walkthrough-step">
+    <div id="walkthrough-arrow"></div>
+    <p id="walkthrough-text"></p>
+    <button id="next-step">Next</button>
+    <button id="skip-walkthrough">Skip</button>
+  </div>
+</div>
 
 
 
@@ -179,6 +197,6 @@
 <script src="popupjs/keywords.js" ></script>
 <script src="popupjs/record.js" ></script>
 <script src="popupjs/main.js"></script>
-
+<script src="walkthrough.js"></script>
 </body>
 </html>
