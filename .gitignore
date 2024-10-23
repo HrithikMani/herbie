@@ -10,6 +10,7 @@ yarn-error.log*
 
 # Environment variables
 .env
+.secrets
 
 # Zip files
 extension.zip
