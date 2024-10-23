@@ -1,16 +1,19 @@
-http://mieweb.github.io/herbie/
 
-Herbie
-======
+## Herbie
 
-Herbie is a set of tools for developing BDD (https://en.wikipedia.org/wiki/Behavior-driven_development) scripts for testing.  The premise is that the scripts should be human understandable and author-able.
+Herbie is a Chrome extension that makes web automation simple and easy. It allows you to perform actions like clicking buttons, filling out forms, and checking for text on a webpage – all with clear, easy-to-understand commands.
 
-There are several different components to Herbie:
+### Key Features:
+1. **Automate Web Actions**: Click, type, and verify elements on any webpage effortlessly.
+2. **Use Keywords for Reusability**: Define custom keywords to reuse common actions, making your scripts cleaner and easier to maintain.
+3. **Record and Save Scripts**: Create and save automation scripts directly from your browser.
+4. **Detailed Logs**: Track what your scripts do and quickly identify any issues.
 
-1. An English like language parser specifically for understanding documentation like directives: Vision.
-2. An interactive inspector to make it easier for Vision authors to discover what elements are on a page.
-3. A simple Vision interpreter that allow an author to test/debug Vision script. 
+Herbie makes it easy for anyone to automate web tasks without needing complex tools or programming knowledge.
 
+Install Herbie from the Chrome Web Store: [Herbie Dev Extension](https://chromewebstore.google.com/detail/herbie-dev/bikchlaboloecmadcmngdofkfpajoahn)
+
+Documentation :  http://mieweb.github.io/herbie/
 
 # How to Install the Chrome Extension
 [Download Link](https://github.com/HrithikMani/herbie/releases/latest)
@@ -38,6 +41,9 @@ An online demo is available here: [Herbie Demo](http://mieweb.github.io/herbie/d
 
 ![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_movie.gif)
 
+Current herbie 
+
+![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_current.gif)
 
 About
 -----
