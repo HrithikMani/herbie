@@ -99,6 +99,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
 
+
+
+    
     return true; // Keep the messaging channel open for asynchronous responses
 });
 
@@ -133,7 +136,15 @@ function sendMessageWithRetry(tabId, data, line, retries = 5) {
 
 chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === "install") {
-        // First-time install detected, set walkthrough flag
-        chrome.storage.local.set({ walkthroughCompleted: false });
+        // Set a flag to track if the walkthrough is completed
+        chrome.storage.local.set({ walkthroughCompleted: false }, () => {
+            console.log("Walkthrough flag initialized.");
+        });
+
+        // Open the external login page on first install
+        chrome.tabs.create({ url: "https://mieweb.github.io/herbie/playgrounds/login.html" });
     }
 });
+
+
+
