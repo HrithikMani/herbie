@@ -43,7 +43,7 @@ An online demo is available here: [Herbie Demo](http://mieweb.github.io/herbie/d
 
 Current herbie 
 
-![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_current.gif)
+![Current version of Herbie](http://mieweb.github.io/herbie/herbie_current.gif)
 
 About
 -----
