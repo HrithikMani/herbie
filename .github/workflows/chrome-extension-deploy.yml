@@ -13,16 +13,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install zip tool
-      run: sudo apt-get install -y zip
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20' # Specify the Node.js version
+
 
     - name: Zip the chrome_extension folder
       run: |
-        cd chrome_extension  # Navigate to the chrome_extension folder
-        zip -r ../extension.zip *  # Zip all files and subfolders inside
+        zip -r extension.zip chrome_extension/*  # Zip all files in the chrome_extension folder
 
     - name: Install chrome-webstore-upload
-      run: npm install -g chrome-webstore-upload
+      run: npm install chrome-webstore-upload
 
     - name: Upload to Chrome Web Store
       env:
@@ -31,7 +33,7 @@ jobs:
         REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
         APP_ID: ${{ secrets.CHROME_APP_ID }}
       run: |
-        chrome-webstore-upload upload --source ./extension.zip \
+        npx chrome-webstore-upload upload --source ./extension.zip \
           --app-id $APP_ID \
           --client-id $CLIENT_ID \
           --client-secret $CLIENT_SECRET \
@@ -44,7 +46,7 @@ jobs:
         REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
         APP_ID: ${{ secrets.CHROME_APP_ID }}
       run: |
-        chrome-webstore-upload publish \
+        npx chrome-webstore-upload publish \
           --app-id $APP_ID \
           --client-id $CLIENT_ID \
           --client-secret $CLIENT_SECRET \
