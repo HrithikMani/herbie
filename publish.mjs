@@ -12,19 +12,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 (async () => {
-  // Dynamically import the ES module
   const chromeWebstoreUpload = await import('chrome-webstore-upload');
 
-  // Use environment variables
-  const extensionId = process.env.EXTENSION_ID;  
-  const clientId = process.env.CLIENT_ID; 
-  const clientSecret = process.env.CLIENT_SECRET; 
-  const refreshToken = process.env.REFRESH_TOKEN; 
+  const extensionId = process.env.EXTENSION_ID;
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+  const refreshToken = process.env.REFRESH_TOKEN;
 
-  const extensionFolder = join(__dirname, 'chrome_extension'); // Path to the folder to zip
-  const zipPath = join(__dirname, 'extension.zip'); // Output zip file path
+  const extensionFolder = join(__dirname, 'chrome_extension');
+  const zipPath = join(__dirname, 'extension.zip');
 
-  // Function to zip the extension folder
   function zipExtension() {
     return new Promise((resolve, reject) => {
       const output = fs.createWriteStream(zipPath);
@@ -37,14 +34,11 @@ const __dirname = dirname(__filename);
 
       archive.on('error', (err) => reject(err));
       archive.pipe(output);
-
-      // Add all files and subdirectories in the extension folder to the zip
-      archive.directory(extensionFolder, false); // The second argument set to false ensures the folder structure is maintained at root level
+      archive.directory(extensionFolder, false);
       archive.finalize();
     });
   }
 
-  // Initialize the web store instance
   const webStore = chromeWebstoreUpload.default({
     extensionId,
     clientId,
@@ -52,23 +46,37 @@ const __dirname = dirname(__filename);
     refreshToken,
   });
 
-  // Function to upload and publish the extension
   async function uploadExtension() {
     try {
       console.log('Zipping the extension...');
-      await zipExtension(); // Step 1: Zip the extension
+      await zipExtension();
 
       console.log('Uploading the extension...');
-      const uploadResponse = await webStore.uploadExisting(zipPath); // Step 2: Upload the extension
+      const uploadResponse = await webStore.uploadExisting(zipPath);
       console.log('Upload Response:', uploadResponse);
 
+      if (uploadResponse.uploadState === 'FAILURE') {
+        const errorDetails = uploadResponse.itemError[0];
+        console.error(`Upload Failed: ${errorDetails.error_code} - ${errorDetails.error_detail}`);
+
+        if (errorDetails.error_code === 'ITEM_NOT_UPDATABLE') {
+          console.error(
+            'The extension cannot be updated now. It is likely in pending review, ready to publish, or marked for deletion.'
+          );
+        }
+        return; // Exit the function if the upload fails
+      }
+
       console.log('Publishing the extension...');
-      const publishResponse = await webStore.publish(); // Step 3: Publish the extension
+      const publishResponse = await webStore.publish();
       console.log('Publish Response:', publishResponse);
+
     } catch (error) {
-      console.error('Error during upload or publish:', error);
+      console.error('Error during upload or publish:', error.message);
+      if (error.response?.error?.message) {
+        console.error(`Additional Info: ${error.response.error.message}`);
+      }
     } finally {
-      // Delete the zip file after processing
       fs.unlink(zipPath, (err) => {
         if (err) {
           console.error(`Failed to delete ${zipPath}:`, err);
@@ -79,6 +87,5 @@ const __dirname = dirname(__filename);
     }
   }
 
-  // Run the upload and publish process
   uploadExtension();
 })();
