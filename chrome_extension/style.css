@@ -1,3 +1,10 @@
+#herbie_documentation a:link, 
+#herbie_documentation a:visited, 
+#herbie_documentation a:hover, 
+#herbie_documentation a:active {
+    color: BLACK; /* Ensure consistent color */
+    text-decoration: none; /* Remove underline */
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
