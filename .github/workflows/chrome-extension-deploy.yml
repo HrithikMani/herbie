@@ -21,8 +21,8 @@ jobs:
         cd chrome_extension  # Navigate to the chrome_extension folder
         zip -r ../extension.zip *  # Zip all files and subfolders inside
 
-    - name: Install webstore-upload-cli
-      run: npm install -g webstore-upload-cli
+    - name: Install chrome-webstore-upload
+      run: npm install -g chrome-webstore-upload
 
     - name: Upload to Chrome Web Store
       env:
@@ -31,7 +31,7 @@ jobs:
         REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
         APP_ID: ${{ secrets.CHROME_APP_ID }}
       run: |
-        webstore upload --source ./extension.zip \
+        chrome-webstore-upload upload --source ./extension.zip \
           --app-id $APP_ID \
           --client-id $CLIENT_ID \
           --client-secret $CLIENT_SECRET \
@@ -44,7 +44,7 @@ jobs:
         REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
         APP_ID: ${{ secrets.CHROME_APP_ID }}
       run: |
-        webstore upload --publish \
+        chrome-webstore-upload publish \
           --app-id $APP_ID \
           --client-id $CLIENT_ID \
           --client-secret $CLIENT_SECRET \
