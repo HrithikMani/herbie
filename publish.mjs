@@ -14,10 +14,10 @@ const __dirname = dirname(__filename);
 (async () => {
   const chromeWebstoreUpload = await import('chrome-webstore-upload');
 
-  const extensionId = process.env.EXTENSION_ID;
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const refreshToken = process.env.REFRESH_TOKEN;
+  const extensionId = process.env.CHROME_APP_ID;
+  const clientId = process.env.CHROME_CLIENT_ID;
+  const clientSecret = process.env.CHROME_CLIENT_SECRET;
+  const refreshToken = process.env.CHROME_REFRESH_TOKEN;
 
   const extensionFolder = join(__dirname, 'chrome_extension');
   const zipPath = join(__dirname, 'extension.zip');
