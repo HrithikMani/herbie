@@ -14,6 +14,7 @@
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
     "chrome-webstore-upload": "^3.1.4",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "mie-simulijs": "^1.1.8"
   }
 }
