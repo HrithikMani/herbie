@@ -41,9 +41,8 @@ An online demo is available here: [Herbie Demo](http://mieweb.github.io/herbie/d
 
 ![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_movie.gif)
 
-Current herbie 
+![Current version of Herbie](https://mieweb.github.io/herbie/herbie_current.gif)
 
-![Current version of Herbie](http://mieweb.github.io/herbie/herbie_current.gif)
 
 About
 -----
