@@ -4,7 +4,8 @@ import fs from 'fs';
 import archiver from 'archiver';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
-import AdmZip from 'adm-zip'; // Install using: npm install adm-zip
+import AdmZip from 'adm-zip';
+import { exec } from 'child_process'; // To run shell commands
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,122 +14,148 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Asynchronous wrapper function to handle the whole process
+const extensionFolder = join(__dirname, 'chrome_extension'); // Main extension folder
+const distFolder = join(extensionFolder, 'dist'); // 'dist' folder inside chrome_extension
+const zipPath = join(__dirname, 'build.zip'); // Save ZIP in the root folder
+
+// Function to run shell commands (e.g., npm install)
+function runCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing command: ${command}\n`, stderr);
+        reject(error);
+      } else {
+        console.log(stdout);
+        resolve(stdout);
+      }
+    });
+  });
+}
+
+// Function to copy index.js from mie-simulijs to dist folder and rename to mie-simulijs.js
+function updateMieSimulijs() {
+  const srcPath = join(__dirname, 'node_modules', 'mie-simulijs', 'index.js'); // Correct file path
+  const destPath = join(distFolder, 'mie-simulijs.js'); // Target path in dist
+
+  if (!fs.existsSync(srcPath)) {
+    throw new Error('mie-simulijs package not found or index.js missing. Ensure it is installed.');
+  }
+
+  fs.copyFileSync(srcPath, destPath);
+  console.log(`Copied index.js from mie-simulijs to ${distFolder} as mie-simulijs.js`);
+}
+
+// Function to inspect the ZIP file's contents
+function inspectZip(filePath) {
+  const zip = new AdmZip(filePath);
+  const entries = zip.getEntries();
+  console.log('Inspecting ZIP contents:');
+  entries.forEach((entry) => {
+    console.log(`- ${entry.entryName}`);
+  });
+}
+
+// Function to generate MD5 checksum of a file
+function generateChecksum(filePath) {
+  const fileBuffer = fs.readFileSync(filePath);
+  const hash = crypto.createHash('md5').update(fileBuffer).digest('hex');
+  console.log(`MD5 Checksum: ${hash}`);
+  return hash;
+}
+
+// Function to zip the chrome_extension folder
+function zipExtension() {
+  return new Promise((resolve, reject) => {
+    console.log('Starting the zipping process...');
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    output.on('close', () => {
+      console.log(`Zipping complete. Total bytes: ${archive.pointer()}`);
+      resolve();
+    });
+
+    archive.on('error', (err) => {
+      console.error('Error during zipping:', err);
+      reject(err);
+    });
+
+    archive.pipe(output);
+    archive.directory(extensionFolder, false); // Zip the entire chrome_extension folder
+    archive.finalize();
+  });
+}
+
+// Main upload function
 (async () => {
   const chromeWebstoreUpload = await import('chrome-webstore-upload');
 
-  // Read environment variables
-  const extensionId = process.env.CHROME_APP_ID;
-  const clientId = process.env.CHROME_CLIENT_ID;
-  const clientSecret = process.env.CHROME_CLIENT_SECRET;
-  const refreshToken = process.env.CHROME_REFRESH_TOKEN;
+  const { CHROME_APP_ID, CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN } = process.env;
 
-  // Validate environment variables
-  if (!extensionId || !clientId || !clientSecret || !refreshToken) {
-    console.error('Missing environment variables. Please check your .env file.');
+  const missingVars = ['CHROME_APP_ID', 'CHROME_CLIENT_ID', 'CHROME_CLIENT_SECRET', 'CHROME_REFRESH_TOKEN']
+    .filter((key) => !process.env[key]);
+
+  if (missingVars.length) {
+    console.error(`Missing environment variables: ${missingVars.join(', ')}`);
     process.exit(1);
-  }
-
-  const extensionFolder = join(__dirname, 'chrome_extension');
-  const zipPath = join(__dirname, 'build.zip'); // Save ZIP in the root
-
-  // Ensure the extension folder exists
-  if (!fs.existsSync(extensionFolder)) {
-    console.error(`Extension folder not found: ${extensionFolder}`);
-    process.exit(1);
-  }
-
-  // Function to zip the extension folder
-  function zipExtension() {
-    return new Promise((resolve, reject) => {
-      console.log('Starting the zipping process...');
-      const output = fs.createWriteStream(zipPath);
-      const archive = archiver('zip', { zlib: { level: 9 } });
-
-      output.on('close', () => {
-        console.log(`Zipping complete. Total bytes: ${archive.pointer()}`);
-        resolve();
-      });
-
-      archive.on('error', (err) => {
-        console.error('Error during zipping:', err);
-        reject(err);
-      });
-
-      archive.pipe(output);
-      archive.directory(extensionFolder, false);
-      archive.finalize();
-    });
-  }
-
-  // Function to inspect the ZIP file's contents
-  function inspectZip(filePath) {
-    const zip = new AdmZip(filePath);
-    const entries = zip.getEntries();
-    console.log('Inspecting ZIP contents:');
-    entries.forEach((entry) => {
-      console.log(`- ${entry.entryName}`);
-    });
-  }
-
-  // Function to generate MD5 checksum of a file
-  function generateChecksum(filePath) {
-    const fileBuffer = fs.readFileSync(filePath);
-    const hash = crypto.createHash('md5').update(fileBuffer).digest('hex');
-    console.log(`MD5 Checksum: ${hash}`);
-    return hash;
   }
 
   const webStore = chromeWebstoreUpload.default({
-    extensionId,
-    clientId,
-    clientSecret,
-    refreshToken,
+    extensionId: CHROME_APP_ID,
+    clientId: CHROME_CLIENT_ID,
+    clientSecret: CHROME_CLIENT_SECRET,
+    refreshToken: CHROME_REFRESH_TOKEN,
   });
 
-  // Function to handle extension upload
-  async function uploadExtension() {
-    try {
-      console.log('Zipping the extension...');
-      await zipExtension();
+  try {
+    console.log('Installing the latest mie-simulijs package...');
+    await runCommand('npm install mie-simulijs');
 
-      console.log('Inspecting the build.zip file before upload...');
-      inspectZip(zipPath);
+    console.log('Copying and renaming mie-simulijs index.js to mie-simulijs.js in the dist folder...');
+    updateMieSimulijs();
 
-      console.log('Generating MD5 checksum for build.zip...');
-      generateChecksum(zipPath);
+    console.log('Zipping the extension...');
+    await zipExtension();
 
-      console.log('Uploading the extension...');
-      const uploadResponse = await webStore.uploadExisting(fs.createReadStream(zipPath));
-      console.log('Upload Response:', uploadResponse);
+    console.log('Inspecting the build.zip file before upload...');
+    inspectZip(zipPath);
 
-      if (uploadResponse.uploadState === 'FAILURE') {
-        const errorDetails = uploadResponse.itemError[0];
-        console.error(`Upload Failed: ${errorDetails.error_code} - ${errorDetails.error_detail}`);
+    console.log('Generating MD5 checksum for build.zip...');
+    generateChecksum(zipPath);
 
-        if (errorDetails.error_code === 'ITEM_NOT_UPDATABLE') {
-          console.error(
-            'The extension cannot be updated now. It is likely in pending review, ready to publish, or marked for deletion.'
-          );
-        }
-        return; // Exit on upload failure
+    console.log('Uploading the extension...');
+    const uploadResponse = await webStore.uploadExisting(fs.createReadStream(zipPath));
+    console.log('Upload Response:', JSON.stringify(uploadResponse, null, 2)); // Pretty-print response
+
+    if (uploadResponse.uploadState === 'FAILURE') {
+      const errorDetails = uploadResponse.itemError[0];
+      console.error(`Upload Failed: ${errorDetails.error_code} - ${errorDetails.error_detail}`);
+      if (errorDetails.error_code === 'ITEM_NOT_UPDATABLE') {
+        console.error('The extension cannot be updated now. It may be in review or marked for deletion.');
       }
-
-      console.log('Publishing the extension...');
-      const publishResponse = await webStore.publish();
-      console.log('Publish Response:', publishResponse);
-
-    } catch (error) {
-      console.error('Error during upload or publish:', error.message);
-      if (error.response?.error?.message) {
-        console.error(`Additional Info: ${error.response.error.message}`);
-      }
-    } finally {
-      console.log(`The build.zip file is saved at ${zipPath} for verification.`);
-      console.log('Skipping deletion of the ZIP file for manual inspection.');
+      return;
     }
-  }
 
-  // Execute the upload process
-  uploadExtension();
+    console.log('Publishing the extension...');
+    const publishResponse = await webStore.publish();
+    console.log('Publish Response:', JSON.stringify(publishResponse, null, 2)); // Pretty-print response
+  } catch (error) {
+    console.error('Error during the process:', error);
+
+    // Show full error object without filtering
+    console.error('Full Error:', JSON.stringify(error, null, 2));
+
+    // Show response details if available
+    if (error.response) {
+      console.error('Response Data:', JSON.stringify(error.response.data, null, 2));
+      console.error(`Status: ${error.response.status} - ${error.response.statusText}`);
+      console.error('Headers:', JSON.stringify(error.response.headers, null, 2));
+    } else {
+      console.error('Unknown Error:', error);
+    }
+  } finally {
+    console.log(`The build.zip file is saved at ${zipPath} for verification.`);
+    console.log('Skipping deletion of the ZIP file for manual inspection.');
+  }
 })();

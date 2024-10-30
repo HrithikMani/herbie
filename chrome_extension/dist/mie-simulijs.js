@@ -144,44 +144,13 @@
   }
 
   function simulationSelector(value) {
-    let element = null;
+    let element = document.getElementById(value) || 
+                  document.querySelector(value) || 
+                  document.querySelector(`.${value}`) || 
+                  document.evaluate(value, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-    // Attempt to select by ID
-    try {
-        element = document.getElementById(value);
-        if (element) return element;
-    } catch (error) {
-        console.error("Error selecting by ID:", error);
-    }
-
-    // Attempt to select by querySelector
-    try {
-        element = document.querySelector(value);
-        if (element) return element;
-    } catch (error) {
-        console.error("Error selecting by querySelector:", error);
-    }
-
-    // Attempt to select by class name
-    try {
-        element = document.querySelector(`.${value}`);
-        if (element) return element;
-    } catch (error) {
-        console.error("Error selecting by class name:", error);
-    }
-
-    // Attempt to select by XPath
-    try {
-        element = document.evaluate(value, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (element) return element;
-    } catch (error) {
-        console.error("Error selecting by XPath:", error);
-    }
-
-    // Return null if no element is found
-    return null;
-}
-
+    return element;
+  }
 
   global.simulijs = {
     simulateClick,
