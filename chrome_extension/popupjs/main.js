@@ -1,25 +1,54 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Load saved script content
-    chrome.storage.local.get(['herbieScriptContent', 'activeTab'], (result) => {
+    // Load saved script content and active tab
+    chrome.storage.local.get(['herbieScriptContent', 'activeTab', 'selectedDropdownOption'], (result) => {
         if (result.herbieScriptContent) {
             document.getElementById('herbie_script').value = result.herbieScriptContent;
         }
         if (result.activeTab) {
             const activeTab = result.activeTab;
-            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tabContent => tabContent.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach((button) => button.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach((tabContent) => tabContent.classList.remove('active'));
             document.querySelector(`[data-tab="${activeTab}"]`).classList.add('active');
             document.getElementById(activeTab).classList.add('active');
         }
-    });
- 
-        const dropdownToggle = document.querySelector('.dropdown-toggle');
-        const dropdownMenu = document.querySelector('.dropdown-menu');
+        if (result.selectedDropdownOption) {
+            const selectedOption = result.selectedDropdownOption;
+            const selectedItem = Array.from(document.querySelectorAll('.dropdown-item')).find(
+                (item) => item.getAttribute('data-tab') === selectedOption
+            );
 
-        // Toggle the display of the dropdown menu on click
-        dropdownToggle.addEventListener('click', () => {
+            if (selectedItem) {
+                selectedItem.click(); // Simulate click to activate the tab
+            }
+        }
+    });
+
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+    // Toggle the display of the dropdown menu on click
+    dropdownToggle.addEventListener('click', () => {
         dropdownMenu.parentElement.classList.toggle('show');
+    });
+
+    // Event listeners for dropdown items
+    dropdownItems.forEach((item) => {
+        item.addEventListener('click', function () {
+            const selectedTab = this.getAttribute('data-tab');
+            chrome.storage.local.set({ selectedDropdownOption: selectedTab }); // Save selected option
+
+            // Hide the dropdown menu after selecting an option
+            dropdownMenu.parentElement.classList.remove('show');
+
+            // Update UI to reflect the selected tab
+            document.querySelectorAll('.tab-content').forEach((content) => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`#${selectedTab}`).classList.add('active');
         });
+    });
 
     // Event listeners for command buttons
     document.getElementById('herbie_parse').addEventListener('click', parseCommand);
@@ -36,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-keyword').addEventListener('click', addKeyword);
 
     // Save script content on change
-    document.getElementById('herbie_script').addEventListener('input', function() {
+    document.getElementById('herbie_script').addEventListener('input', function () {
         const scriptContent = document.getElementById('herbie_script').value;
         chrome.storage.local.set({ herbieScriptContent: scriptContent }, () => {
             console.log('Script content saved.');
@@ -50,24 +79,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (message.action === 'progress') {
             updateProgressBar(message.current, message.total);
-            if (message.current == message.total) {
-                document.getElementById("herbie_progress").style.width = "0px";
+            if (message.current === message.total) {
+                document.getElementById('herbie_progress').style.width = '0px';
             }
         }
     });
 
     // Tab navigation
     const tabs = document.querySelectorAll('.tab-button');
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
         tab.addEventListener('click', function () {
-            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tabContent => tabContent.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach((button) => button.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach((tabContent) => tabContent.classList.remove('active'));
 
             tab.classList.add('active');
             const tabId = tab.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
 
-            // Save the active tab to chrome.storage.local
+            // Save the active tab to Chrome storage
             chrome.storage.local.set({ activeTab: tabId });
 
             if (tabId === 'tab2') {
@@ -82,54 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const textarea =  document.getElementById('herbie_script');
+    // Handle tab navigation via dropdown items
+    document.querySelectorAll('.dropdown-item').forEach((item) => {
+        item.addEventListener('click', function () {
+            const selectedTab = this.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach((content) => content.classList.remove('active'));
+            document.querySelector(`#${selectedTab}`).classList.add('active');
 
-    textarea.addEventListener('keydown', function(event) {
-        if (event.key === 'Tab') {
-            event.preventDefault();
-            const start = this.selectionStart;
-            const end = this.selectionEnd;
+            // Save active tab
+            chrome.storage.local.set({ activeTab: selectedTab });
 
-            // Insert 4 spaces (or '\t' for a tab character)
-            const tabCharacter = '    '; // Or use '\t' for a tab character
-            this.value = this.value.substring(0, start) + tabCharacter + this.value.substring(end);
-
-            // Move the cursor after the inserted tab
-            this.selectionStart = this.selectionEnd = start + tabCharacter.length;
-        }
+            if (selectedTab === 'tab2') {
+                loadLogs();
+            } else if (selectedTab === 'tab3') {
+                loadSavedScripts();
+            } else if (selectedTab === 'tab5') {
+                fetchAndDisplayActions();
+            }
+        });
     });
-    
-   // Select all dropdown items and add click event listeners
-document.querySelectorAll('.dropdown-item').forEach((item) => {
-    item.addEventListener('click', function () {
-      // Hide the dropdown after selecting an option
-      dropdownMenu.parentElement.classList.remove('show');
-  
-      // Remove 'active' class from all tab contents
-      document.querySelectorAll('.tab-content').forEach((content) => {
-        content.classList.remove('active');
-      });
-  
-      // Add 'active' class to the selected tab content
-      const selectedTab = this.getAttribute('data-tab');
-      document.querySelector(`#${selectedTab}`).classList.add('active');
-  
-      // Execute functions based on the selected tab
-      if (selectedTab === 'tab2') {
-        loadLogs();
-      } else if (selectedTab === 'tab3') {
-        loadSavedScripts();
-      } else if (selectedTab === 'tab5') {
-        fetchAndDisplayActions();
-      }
-    });
-  });
-  
 
+    // Save keywords, logs, and actions
     loadKeywords();
     loadLogs();
     loadSavedScripts();
     fetchAndDisplayActions();
 });
-
-
