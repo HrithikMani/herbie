@@ -2,7 +2,7 @@ async function ParseScript(script) {
     if (!script) {
         return [];
     }
-    console.log("hi");
+
     var lines = script.split('\n');
     var cmdtree = [];
     var stack = [];
