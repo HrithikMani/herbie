@@ -18,6 +18,7 @@
       </button>
       <div class="dropdown-menu" >
         <button class="dropdown-item" data-tab="tab1">Herbie</button>
+        <button class="dropdown-item" data-tab="tab6">Usability Testing </button>
         <button class="dropdown-item" data-tab="tab4">Keywords</button>
         <button class="dropdown-item" data-tab="tab5">Record</button>
         <button class="dropdown-item" data-tab="tab3">Saved Scripts</button>
@@ -178,6 +179,37 @@
     <div id="actions_container"></div>
   </div>
 </div>
+
+<div id="tab6" class="tab-content">
+  <h2>Usability Testing</h2>
+  
+  <!-- Test Case Input -->
+  <div class="tab6-form-group">
+    <label for="tab6-test-case" class="tab6-label">
+      <i class="fas fa-pencil-alt"></i> Test Case:
+    </label>
+    <textarea id="tab6-test-case" class="tab6-textarea" placeholder="Paste your test case here..." rows="6"></textarea>
+  </div>
+  
+  <!-- Control Buttons -->
+  <div class="tab6-button-group">
+    <button id="tab6-start-button" class="tab6-btn tab6-btn-primary">
+      <i class="fas fa-play"></i> Start
+    </button>
+    <button id="tab6-next-button" class="tab6-btn tab6-btn-secondary" disabled>
+      <i class="fas fa-step-forward"></i> Next
+    </button>
+    <button id="tab6-stop-button" class="tab6-btn tab6-btn-danger" disabled>
+      <i class="fas fa-stop"></i> Stop
+    </button>
+  </div>
+  
+  <!-- Execution Output -->
+  <div id="tab6-output" class="tab6-output">
+    <p class="tab6-placeholder">Execution logs will appear here...</p>
+  </div>
+</div>
+
 
 <div id="walkthrough-overlay">
   <div id="walkthrough-step">
