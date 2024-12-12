@@ -30,7 +30,8 @@
         "herbie/*",
         "*.png",
         "walkthrough.html",
-        "walkthrough.js"
+        "walkthrough.js",
+        "popup.html"
   
       ],
       "matches": ["<all_urls>"]

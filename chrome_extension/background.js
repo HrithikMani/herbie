@@ -99,8 +99,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
 
-
-
     
     return true; // Keep the messaging channel open for asynchronous responses
 });
@@ -148,3 +146,77 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'PARSE_TEST_CASE') {
+        const scriptContent = message.data;
+        console.log('Received PARSE_TEST_CASE script from extension to background.js:', scriptContent);
+
+        // Fetch global and local keywords from storage
+        chrome.storage.local.get(['globalKeywords'], async (globalResult) => {
+            const globalKeywords = globalResult.globalKeywords || [];
+            
+            chrome.storage.local.get(['localKeywords'], async (localResult) => {
+                const localKeywords = localResult.localKeywords || [];
+                const keywords = globalKeywords.concat(localKeywords);
+
+                // Parse the script
+                try {
+                    const parsedCommands = await ParseScript(scriptContent, keywords);
+                    console.log('Parsed commands:', parsedCommands);
+
+                    // Send back parsed commands as response
+                    sendResponse({ status: 'success', data: parsedCommands });
+                } catch (error) {
+                    console.error('Error parsing test case:', error);
+                    sendResponse({ status: 'error', message: 'Failed to parse test case' });
+                }
+            });
+        });
+
+        return true; // Keep the message channel open for async response
+    }
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Parse Hint Logic
+    if (message.action === 'PARSE_HINT') {
+        const lineContent = message.data;
+        console.log('Received PARSE_HINT request for line:', lineContent);
+
+        // Fetch global and local keywords from storage to parse the single line
+        chrome.storage.local.get(['globalKeywords'], async (result) => {
+            const globalKeywords = result.globalKeywords || [];
+            
+            // Fetch local keywords
+            chrome.storage.local.get(['localKeywords'], async (localResult) => {
+                const localKeywords = localResult.localKeywords || [];
+                const keywords = globalKeywords.concat(localKeywords);
+                
+                // Parse the single line
+                try {
+                    const parsedLine = await ParseScript(lineContent, keywords);
+                    console.log('Parsed hint:', parsedLine);
+
+                    // Send the parsed hint to the content script
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs[0]) {
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                action: 'FIND_HINT_ELEMENT',
+                                data: parsedLine
+                            }, (response) => {
+                                console.log('Response from FIND_HINT_ELEMENT:', response);
+                            });
+                        }
+                    });
+
+                    // No need to send a response back to the sender
+                } catch (error) {
+                    console.error('Error parsing hint:', error);
+                    sendResponse({ status: 'error', message: 'Failed to parse hint' });
+                }
+            });
+        });
+
+        return true; // Keep the messaging channel open for async response
+    }
+});

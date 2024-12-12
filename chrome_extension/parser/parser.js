@@ -93,6 +93,8 @@ async function parseStatement(stmt, cmd) {
                     cmd.code.push('mouseover');
                 case 'verify':
                     cmd.code.push('verify');
+                case 'select':
+                    cmd.code.push('select');
             }
         }
     }
