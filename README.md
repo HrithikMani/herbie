@@ -1,64 +1,107 @@
+# This repo is no longer maintained. Consider using `npm init vite` and selecting the `svelte` option or — if you want a full-fledged app framework — use [SvelteKit](https://kit.svelte.dev), the official application framework for Svelte.
 
-## Herbie
+---
 
-Herbie is a Chrome extension that makes web automation simple and easy. It allows you to perform actions like clicking buttons, filling out forms, and checking for text on a webpage – all with clear, easy-to-understand commands.
+# svelte app
 
-### Key Features:
-1. **Automate Web Actions**: Click, type, and verify elements on any webpage effortlessly.
-2. **Use Keywords for Reusability**: Define custom keywords to reuse common actions, making your scripts cleaner and easier to maintain.
-3. **Record and Save Scripts**: Create and save automation scripts directly from your browser.
-4. **Detailed Logs**: Track what your scripts do and quickly identify any issues.
+This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
 
-Herbie makes it easy for anyone to automate web tasks without needing complex tools or programming knowledge.
+To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
 
-Install Herbie from the Chrome Web Store: [Herbie Dev Extension](https://chromewebstore.google.com/detail/herbie-dev/bikchlaboloecmadcmngdofkfpajoahn)
+```bash
+npx degit sveltejs/template svelte-app
+cd svelte-app
+```
 
-Documentation :  http://mieweb.github.io/herbie/
-
-# How to Install the Chrome Extension
-[Download Link](https://github.com/HrithikMani/herbie/releases/latest)
-1. Clone the project to your local machine or download the chrome extension from above link.
-2. Open Chrome and go to `Preferences... -> Extensions`.
-3. Ensure "Developer mode" is checked (upper left).
-4. Click "Load unpacked extension...".
-5. Browse to the `chrome_extension` folder in the project.
-
-Voila! Now a Herbie robot button should exist on the toolbar. It will inject Herbie into the background of the current tab of any webpage.
-
-## Simulating User Interactions
-
-Instead of using the jQuery Simulate Extended plug-in (a.k.a. jquery-simulate-ext) for simulating complex user interactions based on the [jQuery.simulate()](https://github.com/jquery/jquery-simulate) plug-in, we have used `mie-simulijs`, which was developed in MIE. It's a package that simulates events on the page. Here is the npm package: [mie-simulijs](https://www.npmjs.com/package/mie-simulijs).
-
-We made this change because the jQuery Simulate package was not being maintained, and some events like mouseover and mouseenter were not working as expected. To overcome this, we had to build our own package. Feel free to check out the package.
+*Note that you will need to have [Node.js](https://nodejs.org) installed.*
 
 
-## Initial Herbie
-----
+## Get started
 
-Feel free to check out Herbie, which was written in jQuery in 2015. This was one of the first versions.
+Install the dependencies...
 
-An online demo is available here: [Herbie Demo](http://mieweb.github.io/herbie/demo/index.html#run_herbie)
+```bash
+cd svelte-app
+npm install
+```
 
-![Initial version of Herbie](http://mieweb.github.io/herbie/herbie_movie.gif)
+...then start [Rollup](https://rollupjs.org):
 
-![Current version of Herbie](https://mieweb.github.io/herbie/herbie_current.gif)
+```bash
+npm run dev
+```
+
+Navigate to [localhost:8080](http://localhost:8080). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
+
+By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
+
+If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
+
+## Building and running in production mode
+
+To create an optimised version of the app:
+
+```bash
+npm run build
+```
+
+You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
 
 
-About
------
-Through a fault in manufacturing, a robot, RB-34 (a.k.a. Herbie), is created that possesses telepathic abilities. https://en.wikipedia.org/wiki/Liar!_(short_story)
+## Single-page app mode
 
-References
-----------
+By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
 
-Inspiration has been drawn from:
-* [Gherkin](https://github.com/cucumber/cucumber/wiki/Gherkin) and [Cucumber](https://cukes.info/) but Vision has a slightly different goals.
-* [Sikuli Script](http://www.sikuli.org/) tho specific to the web, and mean to be browser independant.
-* [DalekJS](http://dalekjs.com/pages/documentation.html)
-* [Nightwatch.js](http://nightwatchjs.org/)
-* [Selenium Web Driver](https://code.google.com/p/selenium/wiki/JsonWireProtocol) of course.
-* For recording [xss-keylogger](https://github.com/hadynz/xss-keylogger)
-* [Chrome Extension Examples](https://developer.chrome.com/extensions/samples#search:webnavigation.oncommitted)
-* [Mozilla FireFox Extension](https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Modifying_the_Page_Hosted_by_a_Tab)
-* [Safari Extension Developer](https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html)
-* [Developing Internet Explorer Extensions](http://stackoverflow.com/questions/5643819/developing-internet-explorer-extensions)
+If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
+
+```js
+"start": "sirv public --single"
+```
+
+## Using TypeScript
+
+This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
+
+```bash
+node scripts/setupTypeScript.js
+```
+
+Or remove the script via:
+
+```bash
+rm scripts/setupTypeScript.js
+```
+
+If you want to use `baseUrl` or `path` aliases within your `tsconfig`, you need to set up `@rollup/plugin-alias` to tell Rollup to resolve the aliases. For more info, see [this StackOverflow question](https://stackoverflow.com/questions/63427935/setup-tsconfig-path-in-svelte).
+
+## Deploying to the web
+
+### With [Vercel](https://vercel.com)
+
+Install `vercel` if you haven't already:
+
+```bash
+npm install -g vercel
+```
+
+Then, from within your project folder:
+
+```bash
+cd public
+vercel deploy --name my-project
+```
+
+### With [surge](https://surge.sh/)
+
+Install `surge` if you haven't already:
+
+```bash
+npm install -g surge
+```
+
+Then, from within your project folder:
+
+```bash
+npm run build
+surge public my-project.surge.sh
+```
