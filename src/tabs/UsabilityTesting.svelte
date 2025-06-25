@@ -1,7 +1,8 @@
 <script>
     import { onMount, onDestroy } from "svelte";
     import InjectHerbieButton from '../components/InjectHerbieButton.svelte';
-    
+    import ContentScriptGuard from '../components/ContentScriptGuard.svelte';
+  
     let usabilityTest = null;
     let isRunning = false;
     let elapsedTime = 0;
@@ -165,7 +166,7 @@
         status: usabilityTest.status
     } : {};
 </script>
-  
+  <ContentScriptGuard>
 <div id="usability-test">
     <h1>Usability Testing Mode</h1>
   
@@ -291,6 +292,7 @@
         </div>
     {/if}
 </div>
+</ContentScriptGuard>
   
 <style>
     #usability-test {

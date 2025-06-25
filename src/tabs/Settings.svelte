@@ -162,11 +162,7 @@
                 disabled={isContentScriptToggling}
               />
               <span class="toggle-slider {contentScriptEnabled ? 'enabled' : 'disabled'}">
-                {#if isContentScriptToggling}
-                  <i class="fas fa-spinner fa-spin"></i>
-                {:else}
-                  <i class="fas {contentScriptEnabled ? 'fa-check' : 'fa-times'}"></i>
-                {/if}
+               
               </span>
             </label>
           </div>
