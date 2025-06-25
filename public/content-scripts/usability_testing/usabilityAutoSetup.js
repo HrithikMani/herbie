@@ -23,19 +23,12 @@
     }
     
     function requestObserverSetup(testData) {
-        // Send a specific message for usability testing observer setup
         chrome.runtime.sendMessage({
-            action: "setupUsabilityObservers",
-            testData: testData,
-            herbieScript: testData.herbieScript,
-            url: window.location.href
-        }, (response) => {
-            if (response && response.status === 'success') {
-                console.log("Usability observers setup completed");
-            } else {
-                console.warn("Failed to setup usability observers:", response);
-            }
-        });
+                    action: "setObserver",
+                    herbie_script: testData.herbieScript,
+                     herbieScript: testData.herbieScript,
+                        url: window.location.href
+            });
     }
     
     // Listen for storage changes to detect when usability test starts
@@ -76,6 +69,7 @@
     // Initialize on DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+        console.log("Hi hrtithik")
             setTimeout(initializeUsabilityAutoSetup, 500);
         });
     } else {

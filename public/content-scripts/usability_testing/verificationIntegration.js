@@ -52,34 +52,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         return true;
     }
     
-  if (message.action === "setUsabilityObserver") {
-        console.log("Setting up usability-specific verification observers:", message.herbie_object);
-        
-        try {
-            // Clear any existing usability setup status
-            verificationSetupStatus.clear();
-            
-            // Process all verification items for usability testing
-            if (Array.isArray(message.herbie_object)) {
-                await setupAllVerifications(message.herbie_object);
-                console.log("Usability verification observers set up successfully");
-            } else {
-                console.error("Invalid herbie_object for usability setup:", message.herbie_object);
-            }
-            
-            if (sendResponse) {
-                sendResponse({ status: "success", message: "Usability verification observers set up successfully" });
-            }
-        } catch (error) {
-            console.error("Error setting up usability verification observers:", error);
-            
-            if (sendResponse) {
-                sendResponse({ status: "error", message: `Error setting up usability observers: ${error.message}` });
-            }
-        }
-        
-        return true;
-    }
+ 
 
     // Handle test end to clean up observers
     if (message.action === "endUsabilityTest") {

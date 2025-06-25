@@ -15,6 +15,7 @@
     let testStatus = "inactive";
     
     function loadUsabilityTest() {
+       
         chrome.storage.local.get(null, (items) => {
             const tests = Object.keys(items)
                 .filter((key) => key.startsWith("usabilityTest"))
