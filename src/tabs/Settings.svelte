@@ -124,17 +124,17 @@
   {#if contentScriptStatus === 'disabled'}
     <div class="status-banner disabled">
       <i class="fas fa-exclamation-triangle"></i>
-      <span>Content scripts are disabled. Herbie features will not work properly.</span>
+      <span>Herbie is disabled. Herbie features will not work properly.</span>
     </div>
   {:else if contentScriptStatus === 'enabled'}
     <div class="status-banner enabled">
       <i class="fas fa-check-circle"></i>
-      <span>Content scripts are active. All Herbie features are available.</span>
+      <span>Herbie is active. All Herbie features are available.</span>
     </div>
   {:else if contentScriptStatus === 'unknown'}
     <div class="status-banner unknown">
       <i class="fas fa-question-circle"></i>
-      <span>Content script status unknown. Please check your browser permissions.</span>
+      <span>Herbie status unknown. Please check your browser permissions.</span>
     </div>
   {/if}
 
