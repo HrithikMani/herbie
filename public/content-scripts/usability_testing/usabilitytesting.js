@@ -4,7 +4,7 @@ window.addEventListener("message", (event) => {
   
     if (event.data.action === "startUsabilityTest") {
         console.log("Forwarding usability test start to background script:", event.data);
-        startTracking();
+      
         chrome.runtime.sendMessage({
             action: "startUsabilityTest",
             taskId: event.data.taskId,

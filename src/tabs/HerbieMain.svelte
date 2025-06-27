@@ -202,8 +202,6 @@
   }
 </script>
 
-<!-- Wrap the entire tab content with ContentScriptGuard -->
-<ContentScriptGuard>
   <div id="tab1" class="tab-content active">
     <div id="herbie_div">
       <div id="herbie_buttons">
@@ -320,7 +318,6 @@
       <LogComponent {logs} />
     </div>
   </div>
-</ContentScriptGuard>
 
 <!-- Keep all the existing styles -->
 <style>

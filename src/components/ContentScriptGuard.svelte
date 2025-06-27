@@ -69,7 +69,6 @@
             "content-scripts/usability_testing/usabilityAutoSetup.js",
             "content-scripts/content-scripts.js",
             "content-scripts/dragdrop.js",
-            "content-scripts/userinteractions.js",
             "content-scripts/usability_testing/usabilitytesting.js",
             "content-scripts/inspector.js"
           ],
