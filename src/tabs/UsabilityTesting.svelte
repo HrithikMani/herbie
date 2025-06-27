@@ -167,7 +167,7 @@
         status: usabilityTest.status
     } : {};
 </script>
-  <ContentScriptGuard>
+  
 <div id="usability-test">
     <h1>Usability Testing Mode</h1>
   
@@ -293,7 +293,7 @@
         </div>
     {/if}
 </div>
-</ContentScriptGuard>
+
   
 <style>
     #usability-test {

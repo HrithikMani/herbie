@@ -4,7 +4,7 @@
   // Content script specific states
   let isContentScriptToggling = false;
   let contentScriptEnabled = true;
-  let contentScriptStatus = 'unknown'; // 'enabled', 'disabled', 'unknown'
+  let contentScriptStatus = 'enabled'; // 'enabled', 'disabled', 'unknown'
 
   // Content scripts configuration
   const contentScripts = [
@@ -24,7 +24,6 @@
         "content-scripts/usability_testing/usabilityAutoSetup.js",
         "content-scripts/content-scripts.js",
         "content-scripts/dragdrop.js",
-        "content-scripts/userinteractions.js",
         "content-scripts/usability_testing/usabilitytesting.js",
         "content-scripts/inspector.js"
       ],

@@ -1,7 +1,7 @@
 {
     "name": "Herbie",
     "description": "Herbie is a tool for browser automation and testing.",
-    "version": "2.1",
+    "version": "2.2",
     "manifest_version": 3,
     "icons": {
       "16": "logos/herbie16.png",

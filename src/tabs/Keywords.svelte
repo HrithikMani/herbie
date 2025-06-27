@@ -11,6 +11,7 @@
   let activeTab = "global"; // 'global' or 'local'
   let currentHostname = "";
   let isInspecting = false; // Track if inspection is active
+  let isImporting = false; // NEW: Track import state
 
   /**
    * Extract the main domain from a hostname, removing all subdomains
@@ -182,79 +183,327 @@
     saveInputValues();
   };
 
-  const importKeywords = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const importedData = JSON.parse(e.target.result);
-        
-        // Check if the imported data has the expected format
-        if (importedData.globalKeywords || importedData.localKeywords) {
-          // This is the combined format with both global and local keywords
-          chrome.storage.local.set({
-            globalKeywords: importedData.globalKeywords || [],
-            localKeywords: importedData.localKeywords || {}
-          }, () => {
-            console.log("All keywords imported successfully.");
-            // Reload the keywords to update the UI
-            loadKeywords();
-          });
-        } else {
-          // Fallback for older format - assume it's just a simple array of keywords
-          processImportedKeywords(importedData);
-        }
-      } catch (error) {
-        console.error("Invalid JSON file:", error);
-        alert("Error importing keywords: Invalid file format");
-      }
-    };
-    reader.readAsText(file);
+  // NEW: Function to detect if popup is still open
+  function isPopupStillOpen() {
+    try {
+      // Try to access the document - if popup closed, this might throw
+      return document && document.body && !document.hidden;
+    } catch (e) {
+      return false;
+    }
   }
-};
 
-  const processImportedKeywords = (keywords) => {
-    if (activeTab === "global") {
-      chrome.storage.local.get({ globalKeywords: [] }, (result) => {
-        let globalKeywords = result.globalKeywords || [];
-
-        keywords.forEach((keywordObj) => {
-          const { keyword, xpath, hasVariable = false } = keywordObj;
-          if (!globalKeywords.some((item) => item.keyword === keyword)) {
-            globalKeywords.push({ keyword, xpath, global: true, hasVariable });
-          } else {
-            console.log(`Duplicate keyword skipped: ${keyword}`);
-          }
-        });
-
-        chrome.storage.local.set({ globalKeywords }, () => {
-          console.log("Keywords imported successfully.");
-          loadKeywords();
-        });
+  // NEW: Enhanced file selection with popup state monitoring
+  function selectFileWithFocusRetention() {
+    return new Promise((resolve, reject) => {
+      // Check initial popup state
+      if (!isPopupStillOpen()) {
+        reject(new Error('Popup already closed'));
+        return;
+      }
+      
+      const currentWindow = window;
+      const currentDocument = document;
+      
+      // Create file input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.multiple = false;
+      
+      // Better hiding technique that works across browsers
+      input.style.cssText = `
+        position: fixed !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        opacity: 0 !important;
+        width: 1px !important;
+        height: 1px !important;
+        z-index: -1 !important;
+        pointer-events: auto !important;
+      `;
+      
+      let handled = false;
+      let popupMonitor;
+      
+      // Monitor popup state
+      popupMonitor = setInterval(() => {
+        if (!isPopupStillOpen() && !handled) {
+          console.log('Popup closed during file selection');
+          handled = true;
+          cleanup();
+          // Don't reject here - the file selection might still complete
+        }
+      }, 100);
+      
+      input.addEventListener('change', function(event) {
+        if (handled) return;
+        handled = true;
+        
+        const file = event.target.files[0];
+        cleanup();
+        
+        if (file) {
+          resolve(file);
+        } else {
+          reject(new Error('No file selected'));
+        }
       });
-    } else {
-      if (currentHostname) {
-        chrome.storage.local.get({ localKeywords: {} }, (result) => {
-          const allLocalKeywords = result.localKeywords || {};
-          const siteKeywords = allLocalKeywords[currentHostname] || [];
+      
+      // Better focus management
+      input.addEventListener('focus', () => {
+        console.log('File input focused - popup should stay open');
+      });
+      
+      // Handle the case where dialog is cancelled
+      let dialogOpened = false;
+      
+      input.addEventListener('click', (e) => {
+        dialogOpened = true;
+        console.log('File dialog should be opening');
+      });
+      
+      // Cleanup function
+      function cleanup() {
+        try {
+          if (popupMonitor) {
+            clearInterval(popupMonitor);
+            popupMonitor = null;
+          }
+          if (input.parentNode) {
+            input.parentNode.removeChild(input);
+          }
+        } catch (e) {
+          console.warn('Cleanup warning:', e);
+        }
+      }
+      
+      // Extended timeout for slow file selection
+      const timeout = setTimeout(() => {
+        if (!handled) {
+          handled = true;
+          cleanup();
+          if (dialogOpened) {
+            // Dialog was opened but no file selected (user cancelled)
+            reject(new Error('User cancelled'));
+          } else {
+            // Dialog never opened
+            reject(new Error('File dialog failed to open'));
+          }
+        }
+      }, 60000); // 60 second timeout
+      
+      // Add input to DOM
+      currentDocument.body.appendChild(input);
+      
+      // Improved triggering sequence
+      setTimeout(() => {
+        if (!handled && isPopupStillOpen()) {
+          try {
+            // Ensure popup window is focused
+            currentWindow.focus();
+            
+            // Create a user gesture context
+            const clickEvent = new MouseEvent('click', {
+              view: currentWindow,
+              bubbles: true,
+              cancelable: true
+            });
+            
+            // Focus and click the input
+            input.focus();
+            input.dispatchEvent(clickEvent);
+            input.click();
+            
+            // Monitor for successful dialog opening
+            setTimeout(() => {
+              if (!dialogOpened && !handled) {
+                console.warn('File dialog may not have opened, trying alternative method');
+                // Try direct click as backup
+                input.click();
+              }
+            }, 200);
+            
+          } catch (error) {
+            console.error('Error triggering file dialog:', error);
+            cleanup();
+            clearTimeout(timeout);
+            reject(error);
+          }
+        }
+      }, 100);
+      
+      // Clean up timeout on completion
+      const originalCleanup = cleanup;
+      cleanup = () => {
+        originalCleanup();
+        clearTimeout(timeout);
+      };
+    });
+  }
+
+  // NEW: Function to process the selected file
+  async function processSelectedFile(file) {
+    if (!file) {
+      throw new Error('No file provided');
+    }
+    
+    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      throw new Error('Please select a JSON file');
+    }
+    
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const importedData = JSON.parse(e.target.result);
           
+          // Check if the imported data has the expected format
+          if (importedData.globalKeywords || importedData.localKeywords) {
+            // This is the combined format with both global and local keywords
+            chrome.storage.local.set({
+              globalKeywords: importedData.globalKeywords || [],
+              localKeywords: importedData.localKeywords || {}
+            }, () => {
+              console.log("All keywords imported successfully.");
+              // Reload the keywords to update the UI
+              loadKeywords();
+              resolve();
+            });
+          } else {
+            // Fallback for older format - assume it's just a simple array of keywords
+            processImportedKeywords(importedData);
+            resolve();
+          }
+        } catch (error) {
+          console.error("Invalid JSON file:", error);
+          reject(new Error("Invalid JSON file format"));
+        }
+      };
+      
+      reader.onerror = () => {
+        reject(new Error('Error reading file'));
+      };
+      
+      reader.readAsText(file);
+    });
+  }
+
+  // NEW: Modern API approach for browsers that support showOpenFilePicker
+  async function handleModernImport() {
+    try {
+      // Check if the modern File System Access API is available
+      if ('showOpenFilePicker' in window) {
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [{
+            description: 'JSON files',
+            accept: { 'application/json': ['.json'] }
+          }],
+          multiple: false
+        });
+        
+        const file = await fileHandle.getFile();
+        await processSelectedFile(file);
+        
+        return true; // Success with modern API
+      }
+      return false; // Modern API not available
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        // User cancelled - not an error
+        return true;
+      }
+      throw error;
+    }
+  }
+
+  // NEW: Import handler that prevents popup closing
+  async function handleImportClick() {
+    if (isImporting) return; // Prevent multiple clicks
+    
+    isImporting = true;
+    
+    try {
+      const file = await selectFileWithFocusRetention();
+      if (file) {
+        await processSelectedFile(file);
+      }
+    } catch (error) {
+      if (error.message !== 'User cancelled' && error.message !== 'No file selected') {
+        console.error('Import error:', error);
+        alert('Error importing file: ' + error.message);
+      }
+    } finally {
+      isImporting = false;
+    }
+  }
+
+  // NEW: Main import function that tries modern first, then fallback
+  async function handleSmartImport() {
+    try {
+      // Try modern API first
+      const modernSuccess = await handleModernImport();
+      if (modernSuccess) {
+        return;
+      }
+      
+      // Fallback to the focus retention method
+      await handleImportClick();
+      
+    } catch (error) {
+      console.error('Import failed:', error);
+      alert('Import failed: ' + error.message);
+    }
+  }
+
+  // UPDATED: Enhanced processImportedKeywords function with better error handling
+  const processImportedKeywords = (keywords) => {
+    try {
+      if (activeTab === "global") {
+        chrome.storage.local.get({ globalKeywords: [] }, (result) => {
+          let globalKeywords = result.globalKeywords || [];
+
           keywords.forEach((keywordObj) => {
             const { keyword, xpath, hasVariable = false } = keywordObj;
-            if (!siteKeywords.some((item) => item.keyword === keyword)) {
-              siteKeywords.push({ keyword, xpath, global: false, hasVariable });
+            if (!globalKeywords.some((item) => item.keyword === keyword)) {
+              globalKeywords.push({ keyword, xpath, global: true, hasVariable });
             } else {
               console.log(`Duplicate keyword skipped: ${keyword}`);
             }
           });
-          
-          allLocalKeywords[currentHostname] = siteKeywords;
-          chrome.storage.local.set({ localKeywords: allLocalKeywords }, () => {
-            console.log("Local keywords imported successfully.");
+
+          chrome.storage.local.set({ globalKeywords }, () => {
+            console.log("Keywords imported successfully.");
             loadKeywords();
           });
         });
+      } else {
+        if (currentHostname) {
+          chrome.storage.local.get({ localKeywords: {} }, (result) => {
+            const allLocalKeywords = result.localKeywords || {};
+            const siteKeywords = allLocalKeywords[currentHostname] || [];
+            
+            keywords.forEach((keywordObj) => {
+              const { keyword, xpath, hasVariable = false } = keywordObj;
+              if (!siteKeywords.some((item) => item.keyword === keyword)) {
+                siteKeywords.push({ keyword, xpath, global: false, hasVariable });
+              } else {
+                console.log(`Duplicate keyword skipped: ${keyword}`);
+              }
+            });
+            
+            allLocalKeywords[currentHostname] = siteKeywords;
+            chrome.storage.local.set({ localKeywords: allLocalKeywords }, () => {
+              console.log("Local keywords imported successfully.");
+              loadKeywords();
+            });
+          });
+        }
       }
+    } catch (error) {
+      console.error('Error processing imported keywords:', error);
+      throw new Error('Error processing imported keywords');
     }
   };
 
@@ -376,7 +625,7 @@
   });
 };
 
-  // Handle inspect button click - NEW FUNCTION
+  // Handle inspect button click
   const handleInspectClick = () => {
     isInspecting = true;
     
@@ -423,20 +672,18 @@
     >
       <i class="fas fa-search"></i> {isInspecting ? 'Inspecting...' : 'Inspect'}
     </button>
-    <input
-      type="file"
-      id="file-input"
-      accept="application/json"
-      on:change={importKeywords}
-      style="display: none;"
-    />
+    
+    <!-- UPDATED: New import button without hidden file input -->
     <button
       id="import-keywords"
-      class="action-button"
-      on:click={() => document.getElementById("file-input").click()}
+      class="action-button {isImporting ? 'importing' : ''}"
+      on:click={handleSmartImport}
+      disabled={isImporting}
     >
-      <i class="fas fa-file-import"></i> Import
+      <i class="fas {isImporting ? 'fa-spinner fa-spin' : 'fa-file-import'}"></i> 
+      {isImporting ? 'Importing...' : 'Import'}
     </button>
+    
     <button
       id="export-keywords"
       class="action-button"
@@ -685,6 +932,12 @@
     background-color: #6c757d;
     cursor: not-allowed;
     opacity: 0.7;
+  }
+
+  /* NEW: Importing state styles */
+  .action-button.importing {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
   
   .action-button i {
