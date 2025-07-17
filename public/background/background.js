@@ -230,6 +230,16 @@ async function handleEndUsabilityTest(message, sendResponse) {
 
     sendTestResultsToTargetTab(testResults);
 
+    const response = await fetch("http://localhost:3000/api/usability-test-results ", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Herbie-Version': chrome.runtime.getManifest()?.version || '2.2',
+                    'X-Request-Source': 'herbie-extension'
+                },
+                body: JSON.stringify(testResults),
+    });
+
     // Clear verification statements
     for (const key in verifyStmpts) {
       if (Object.prototype.hasOwnProperty.call(verifyStmpts, key)) {
