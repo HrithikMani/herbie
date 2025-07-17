@@ -235,7 +235,31 @@ async function handleEndUsabilityTest(message, sendResponse) {
 
     sendTestResultsToTargetTab(testResults);
 
-    const response = await fetch("http://localhost/api/usability-test-results ", {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs.length > 0) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: "showConfetti",
+          testData: {
+            taskId: message.taskId,
+            taskName: message.taskName,
+            testerName: message.testerName,
+            time: message.time
+          }
+        }, (response) => {
+          if (chrome.runtime.lastError) {
+            log("Confetti message failed:", chrome.runtime.lastError.message);
+          } else {
+            log("🎉 Confetti triggered successfully:", response);
+          }
+        });
+      }
+    } catch (confettiError) {
+      log("Error showing confetti:", confettiError);
+    }
+
+
+    const response = await fetch("http://localhost:3000/api/usability-test-results ", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
