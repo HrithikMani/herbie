@@ -4,6 +4,7 @@
   import LogComponent from '../components/LogComponent.svelte';
   import ContentScriptGuard from '../components/ContentScriptGuard.svelte';
     import HeraderSection from "../components/HerbieTabComponents/HeraderSection.svelte";
+    import ProgressBar from "../components/HerbieTabComponents/ProgressBar.svelte";
   
   export let activeTab;
   let progress = 0;
@@ -170,7 +171,7 @@
     <div id="herbie_div">
      <HeraderSection></HeraderSection>
 
-      <!-- Verification Results Display -->
+      <!-- Verification Results Display 
       {#if lastVerificationResult}
         <div class="verification-status-container">
           <div class="verification-status {lastVerificationResult.success ? 'success' : 'failure'}">
@@ -187,12 +188,9 @@
           </div>
         </div>
       {/if}
-
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div id="herbie_progress" class="progress-bar"></div>
-      </div>
-
+      -->
+     <ProgressBar percentage="50"></ProgressBar>
+     
       <!-- Script Area -->
       <div class="herbie_script">
         <label class="prompt" for="herbie_script">Script:</label>

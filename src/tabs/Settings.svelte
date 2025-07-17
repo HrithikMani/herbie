@@ -146,7 +146,7 @@
       <div class="setting-item">
         <div class="setting-header">
           <div class="setting-info">
-            <h3>Enable Content Scripts</h3>
+            <h3>Enable Herbie</h3>
             <p class="setting-description">
               Allow Herbie to inject scripts into web pages for automation and testing features.
             </p>
