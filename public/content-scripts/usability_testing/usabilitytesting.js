@@ -1,27 +1,72 @@
-// Enhanced usabilitytesting.js with GitHub markdown parsing support
+// public/content-scripts/usability_testing/usabilitytesting.js
+// Complete file with persistent tester name functionality and GitHub markdown parsing
 
-window.addEventListener("message", (event) => {
+// Function to get stored tester name directly from Chrome storage
+async function getStoredTesterName() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(['persistentTesterName'], (result) => {
+            resolve(result.persistentTesterName || null);
+        });
+    });
+}
+
+// Function to store tester name directly in Chrome storage
+async function storeTesterName(testerName) {
+    return new Promise((resolve) => {
+        chrome.storage.local.set({ 
+            persistentTesterName: testerName,
+            testerNameLastUpdated: Date.now()
+        }, () => {
+            resolve(true);
+        });
+    });
+}
+
+window.addEventListener("message", async (event) => {
     if (event.source !== window || !event.data) return;
   
     if (event.data.action === "startUsabilityTest") {
         console.log("Forwarding usability test start to background script:", event.data);
-      
+        
+        // Get tester name from storage or use provided name
+        let testerName = event.data.testerName;
+        if (!testerName) {
+            testerName = await getStoredTesterName() || "Anonymous";
+        }
+        
         chrome.runtime.sendMessage({
             action: "startUsabilityTest",
             taskId: event.data.taskId,
             taskName: event.data.taskName,
             description: event.data.description,
             testHerbieScript: event.data.testHerbieScript,
-            testerName: event.data.testerName,
+            testerName: testerName,
         });
-       console.log(JSON.stringify(event.data.herbieKeywords));
-
-            if (event.data.herbieKeywords) {
-                chrome.storage.local.set({
-                    globalKeywords: event.data.herbieKeywords.globalKeywords,
-                    localKeywords: event.data.herbieKeywords.localKeywords
-                });
-            }
+        
+        if (event.data.herbieKeywords) {
+            chrome.storage.local.set({
+                globalKeywords: event.data.herbieKeywords.globalKeywords,
+                localKeywords: event.data.herbieKeywords.localKeywords
+            });
+        }
+    }
+    
+    // Handle request for stored tester name
+    if (event.data.action === "getStoredTesterName") {
+        const storedName = await getStoredTesterName();
+        window.postMessage({
+            action: "storedTesterNameResponse",
+            testerName: storedName
+        }, "*");
+    }
+    
+    // Handle updating tester name
+    if (event.data.action === "updateTesterName") {
+        const success = await storeTesterName(event.data.testerName);
+        window.postMessage({
+            action: "testerNameUpdateResponse",
+            success: success
+        }, "*");
     }
 });
 
@@ -96,8 +141,11 @@ function processMarkdownContent(markdownText) {
     }
 }
 
-// Show extracted test details in a modal or notification
-function showTestDetails(testData) {
+// Show extracted test details in a modal with tester name management
+async function showTestDetails(testData) {
+    // Get current stored tester name
+    const currentTesterName = await getStoredTesterName() || '';
+    
     // Create a modal to display the extracted details
     const modal = document.createElement('div');
     modal.id = 'herbie-test-details-modal';
@@ -129,43 +177,52 @@ function showTestDetails(testData) {
     
     modalContent.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px;">
-            <h2 style="margin: 0; color: #333; font-size: 20px;">🤖 Herbie Test Details</h2>
+            <h2 style="margin: 0; color: #333; font-size: 20px;">Herbie Test Details</h2>
             <button id="herbie-close-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
         </div>
         
         <div style="margin-bottom: 16px;">
-            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">📋 Task Name</h3>
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">Tester Name</h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="herbie-tester-name" value="${currentTesterName}" placeholder="Enter your name" style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                <button id="herbie-save-name" style="background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; white-space: nowrap;">Save</button>
+            </div>
+            <div id="herbie-name-status" style="margin-top: 4px; font-size: 12px; height: 16px;"></div>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">Task Name</h3>
             <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; border-left: 4px solid #007bff;">
                 ${testData.taskName || 'Not specified'}
             </div>
         </div>
         
         <div style="margin-bottom: 16px;">
-            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">📝 Description</h3>
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">Description</h3>
             <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; border-left: 4px solid #28a745; white-space: pre-line;">
                 ${testData.description || 'Not specified'}
             </div>
         </div>
         
         <div style="margin-bottom: 16px;">
-            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">🌐 URL</h3>
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">URL</h3>
             <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; border-left: 4px solid ${testData.url ? '#ffc107' : '#dc3545'};">
                 ${testData.url ? 
                     `<a href="${testData.url}" target="_blank" style="color: #007bff; text-decoration: none;">${testData.url}</a>` : 
-                    '<span style="color: #dc3545; font-style: italic;">⚠️ No URL specified in markdown</span>'
+                    '<span style="color: #dc3545; font-style: italic;">No URL specified in markdown</span>'
                 }
             </div>
         </div>
         
         <div style="margin-bottom: 20px;">
-            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">🤖 Herbie Script</h3>
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">Herbie Script</h3>
             <div style="background: #f3f4f6; padding: 12px; border-radius: 4px; border-left: 4px solid #6f42c1; font-family: 'Courier New', monospace; font-size: 13px; white-space: pre-line; max-height: 200px; overflow-y: auto;">
                 ${testData.herbieScript || 'Not specified'}
             </div>
         </div>
         
         <div style="margin-bottom: 16px;">
-            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">🆔 Generated Task ID</h3>
+            <h3 style="margin: 0 0 8px 0; color: #333; font-size: 16px;">Generated Task ID</h3>
             <div style="background: #f8f9fa; padding: 12px; border-radius: 4px; border-left: 4px solid #17a2b8; font-family: monospace; font-size: 12px;">
                 ${testData.taskId}
             </div>
@@ -173,10 +230,10 @@ function showTestDetails(testData) {
         
         <div style="text-align: center; padding-top: 16px; border-top: 1px solid #eee;">
             <button id="herbie-start-test" style="background: ${testData.url ? '#28a745' : '#6c757d'}; color: white; border: none; padding: 12px 24px; border-radius: 4px; margin-right: 12px; cursor: ${testData.url ? 'pointer' : 'not-allowed'}; font-size: 14px; font-weight: bold;" ${!testData.url ? 'disabled' : ''}>
-                🚀 ${testData.url ? 'Start Test' : 'No URL Specified'}
+                ${testData.url ? 'Start Test' : 'No URL Specified'}
             </button>
             <button id="herbie-copy-details" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 12px; cursor: pointer; font-size: 14px;">
-                📋 Copy JSON
+                Copy JSON
             </button>
             <button id="herbie-close-modal-btn" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">
                 Close
@@ -195,14 +252,52 @@ function showTestDetails(testData) {
         });
     });
     
+    // Save tester name functionality
+    const saveNameBtn = modal.querySelector('#herbie-save-name');
+    const testerNameInput = modal.querySelector('#herbie-tester-name');
+    const nameStatus = modal.querySelector('#herbie-name-status');
+    
+    saveNameBtn.addEventListener('click', async () => {
+        const newName = testerNameInput.value.trim();
+        if (newName) {
+            await storeTesterName(newName);
+            nameStatus.textContent = 'Name saved successfully!';
+            nameStatus.style.color = '#28a745';
+            
+            // Clear status after 3 seconds
+            setTimeout(() => {
+                nameStatus.textContent = '';
+            }, 3000);
+        } else {
+            nameStatus.textContent = 'Please enter a name';
+            nameStatus.style.color = '#dc3545';
+            
+            setTimeout(() => {
+                nameStatus.textContent = '';
+            }, 3000);
+        }
+    });
+    
+    // Save name on Enter key
+    testerNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveNameBtn.click();
+        }
+    });
+    
     // Start test functionality
     const startButton = modal.querySelector('#herbie-start-test');
     if (testData.url) {
-        startButton.addEventListener('click', () => {
+        startButton.addEventListener('click', async () => {
             console.log("Starting usability test with data:", testData);
             
-            // Get tester name
-            const testerName = prompt("Enter your name for this usability test:") || "Anonymous";
+            // Get current tester name from input field
+            const testerName = testerNameInput.value.trim() || 'Anonymous';
+            
+            // Save the name if it's not empty
+            if (testerName !== 'Anonymous') {
+                await storeTesterName(testerName);
+            }
             
             try {
                 // Create message data for background script
@@ -221,17 +316,13 @@ function showTestDetails(testData) {
                 
                 // Send to background script using existing infrastructure
                 chrome.runtime.sendMessage(usabilityTestData, (response) => {
+                    console.log("Usability test started successfully:", response);
                     
-                        console.log("Usability test started successfully:", response);
-                        
-                      
-                        // Close the modal
-                        document.body.removeChild(modal);
-                        
-                        // Open the URL in a new tab
-                        window.open(testData.url, '_blank');
-                        
-                   
+                    // Close the modal
+                    document.body.removeChild(modal);
+                    
+                    // Open the URL in a new tab
+                    window.open(testData.url, '_blank');
                 });
                 
             } catch (error) {
@@ -381,30 +472,6 @@ function parseUsabilityTestMarkdown(markdownText) {
     }
 }
 
-// Start usability test from parsed markdown data (PLACEHOLDER - will be implemented later)
-function startUsabilityTestFromMarkdown(testData) {
-    console.log("startUsabilityTestFromMarkdown called with:", testData);
-    showNotification("Test starting functionality will be implemented soon!", "info");
-    
-    // TODO: Implement test starting logic
-    // const testerName = prompt("Enter your name for this usability test:") || "Anonymous";
-    // 
-    // const usabilityTestData = {
-    //     taskId: testData.taskId,
-    //     taskName: testData.taskName,
-    //     description: testData.description,
-    //     testHerbieScript: testData.herbieScript,
-    //     testerName: testerName,
-    //     url: testData.url,
-    //     source: 'github_markdown'
-    // };
-    // 
-    // chrome.runtime.sendMessage({
-    //     action: "startUsabilityTest",
-    //     ...usabilityTestData
-    // });
-}
-
 // Generate a unique task ID
 function generateTaskId() {
     return `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -459,7 +526,7 @@ function addDetectionButton() {
     // Create button
     const button = document.createElement('button');
     button.id = 'herbie-detect-btn';
-    button.innerHTML = '🔍 Extract Test Details';
+    button.innerHTML = 'Extract Test Details';
     button.style.cssText = `
         position: fixed;
         top: 60px;
@@ -493,7 +560,7 @@ function addDetectionButton() {
     
     button.addEventListener('click', () => {
         console.log("Herbie button clicked, extracting details...");
-        button.innerHTML = '🔄 Parsing...';
+        button.innerHTML = 'Parsing...';
         button.style.backgroundColor = '#ffc107';
         button.style.color = '#000';
         
@@ -502,7 +569,7 @@ function addDetectionButton() {
             
             // Reset button after processing
             setTimeout(() => {
-                button.innerHTML = '🔍 Extract Test Details';
+                button.innerHTML = 'Extract Test Details';
                 button.style.backgroundColor = '#007bff';
                 button.style.color = 'white';
             }, 2000);
@@ -550,7 +617,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.action === "updateUsabilityResults") {
         console.log("Updating usability test attribute:", message.data);
 
@@ -568,3 +635,38 @@ chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
         sendResponse({ status: "Test results rendered successfully" });
     }
 });
+
+// Utility object for managing tester names (can be called from UI)
+window.usabilityTesterManager = {
+    // Get current stored tester name
+    async getCurrentTesterName() {
+        return await getStoredTesterName();
+    },
+    
+    // Update tester name
+    async updateTesterName(newName) {
+        if (newName && newName.trim()) {
+            const success = await storeTesterName(newName.trim());
+            if (success) {
+                console.log(`Updated tester name to: ${newName}`);
+            }
+            return success;
+        }
+        return false;
+    },
+    
+    // Clear stored tester name
+    async clearTesterName() {
+        return new Promise((resolve) => {
+            chrome.storage.local.remove(['persistentTesterName', 'testerNameLastUpdated'], () => {
+                resolve(true);
+            });
+        });
+    },
+    
+    // Check if tester name is stored
+    async hasTesterName() {
+        const name = await getStoredTesterName();
+        return name !== null && name !== "Anonymous";
+    }
+};

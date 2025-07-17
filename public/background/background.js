@@ -72,6 +72,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'executeScriptFromInject':
       return handleExecuteScriptFromInject(message, sendResponse);
 
+    case 'setTesterName':
+      return handleSetTesterName(message, sendResponse);
+    case 'getTesterName':
+      return handleGetTesterName(message, sendResponse);
+
     default:
       warn("Unhandled message action:", message.action);
       return false;
@@ -230,7 +235,7 @@ async function handleEndUsabilityTest(message, sendResponse) {
 
     sendTestResultsToTargetTab(testResults);
 
-    const response = await fetch("http://localhost:3000/api/usability-test-results ", {
+    const response = await fetch("http://localhost/api/usability-test-results ", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -575,4 +580,42 @@ async function reinjeetComponentDirect(tabId) {
   } catch (err) {
     error('Error checking for re-injection:', err);
   }
+}
+
+
+async function handleSetTesterName(message, sendResponse) {
+  try {
+    const { testerName } = message;
+    
+    // Store tester name persistently
+    await chrome.storage.local.set({ 
+      persistentTesterName: testerName,
+      testerNameLastUpdated: Date.now()
+    });
+    
+    console.log(`Stored tester name: ${testerName}`);
+    sendResponse({ status: 'success', message: 'Tester name saved' });
+  } catch (error) {
+    console.error("Error storing tester name:", error);
+    sendResponse({ status: 'error', message: error.message });
+  }
+  return true;
+}
+
+async function handleGetTesterName(message, sendResponse) {
+  try {
+    const result = await chrome.storage.local.get(['persistentTesterName', 'testerNameLastUpdated']);
+    
+    sendResponse({ 
+      status: 'success', 
+      data: {
+        testerName: result.persistentTesterName || null,
+        lastUpdated: result.testerNameLastUpdated || null
+      }
+    });
+  } catch (error) {
+    console.error("Error retrieving tester name:", error);
+    sendResponse({ status: 'error', message: error.message });
+  }
+  return true;
 }
