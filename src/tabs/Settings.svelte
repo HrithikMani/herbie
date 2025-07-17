@@ -25,7 +25,8 @@
         "content-scripts/content-scripts.js",
         "content-scripts/dragdrop.js",
         "content-scripts/usability_testing/usabilitytesting.js",
-        "content-scripts/inspector.js"
+        "content-scripts/inspector.js",
+        "content-scripts/confetti.js",
       ],
       runAt: "document_idle"
     }
