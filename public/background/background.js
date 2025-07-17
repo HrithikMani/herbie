@@ -1,6 +1,7 @@
 import { ParseScript } from '../parser/parser.js';
 import { handleParseLine, handleParseScript } from './utils/parseUtils.js';
 import { handleRunScript, handleExecuteScript } from './utils/runUtils.js';
+import { log, warn, error, info, debug } from './utils/logger.js'; // Import centralized logging
 
 // ============================================================================
 // GLOBAL STATE VARIABLES
@@ -15,7 +16,7 @@ let usabilityHerbieScriptParsed = null;
 // CORE MESSAGE ROUTER
 // ============================================================================
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Background received message:", message.action);
+  log("Background received message:", message.action);
 
   // Route to appropriate handler
   switch (message.action) {
@@ -71,8 +72,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'executeScriptFromInject':
       return handleExecuteScriptFromInject(message, sendResponse);
 
+    case 'setTesterName':
+      return handleSetTesterName(message, sendResponse);
+    case 'getTesterName':
+      return handleGetTesterName(message, sendResponse);
+
     default:
-      console.warn("Unhandled message action:", message.action);
+      warn("Unhandled message action:", message.action);
       return false;
   }
 });
@@ -83,9 +89,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function handleParseLineMessage(message, sendResponse) {
   try {
     await handleParseLine(message.payload, sendResponse);
-  } catch (error) {
-    console.error("Error in handleParseLine:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error in handleParseLine:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -93,9 +99,9 @@ async function handleParseLineMessage(message, sendResponse) {
 async function handleParseScriptMessage(message, sendResponse) {
   try {
     await handleParseScript(message.payload, sendResponse);
-  } catch (error) {
-    console.error("Error in handleParseScript:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error in handleParseScript:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -103,9 +109,9 @@ async function handleParseScriptMessage(message, sendResponse) {
 async function handleRunScriptMessage(message, sendResponse) {
   try {
     await handleRunScript(message.payload, sendResponse);
-  } catch (error) {
-    console.error("Error in handleRunScript:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error in handleRunScript:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -113,9 +119,9 @@ async function handleRunScriptMessage(message, sendResponse) {
 async function handleExecuteScriptMessage(message, sendResponse) {
   try {
     cmdtree = await handleExecuteScript(message.payload, sendResponse);
-  } catch (error) {
-    console.error("Error in handleExecuteScript:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error in handleExecuteScript:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -124,7 +130,7 @@ async function handleExecuteScriptMessage(message, sendResponse) {
 // PROGRESS AND LOGGING HANDLERS
 // ============================================================================
 function handleProgressUpdate(message, sendResponse) {
-  console.log("Message received in popup:", message.data);
+  log("Message received in popup:", message.data);
   chrome.runtime.sendMessage({
     action: "updatePopupProgressBar",
     data: message.data,
@@ -134,7 +140,7 @@ function handleProgressUpdate(message, sendResponse) {
 }
 
 function handleResultUpdate(message, sendResponse) {
-  console.log("Message received in popup:", message.data);
+  log("Message received in popup:", message.data);
   chrome.runtime.sendMessage({
     action: "updatePopupResult",
     data: message.data,
@@ -144,7 +150,7 @@ function handleResultUpdate(message, sendResponse) {
 }
 
 function handleLogUpdate(message, sendResponse) {
-  console.log("Message received in popup:", message.data);
+  log("Message received in popup:", message.data);
   chrome.runtime.sendMessage({
     action: "updateLogPopup",
     data: message.data,
@@ -159,12 +165,12 @@ function handleLogUpdate(message, sendResponse) {
 // ============================================================================
 async function handleStartUsabilityTest(message, sendResponse) {
   try {
-    console.log("Starting usability test:", message.testerName);
+    log("Starting usability test:", message.testerName);
 
     // Parse the Herbie script
     usabilityHerbieScript = message.testHerbieScript;
     usabilityHerbieScriptParsed = await ParseScript(usabilityHerbieScript);
-    console.log("Parsed usability script:", usabilityHerbieScriptParsed);
+    log("Parsed usability script:", usabilityHerbieScriptParsed);
 
     // Initialize verification statements
     verifyStmpts = {};
@@ -196,13 +202,13 @@ async function handleStartUsabilityTest(message, sendResponse) {
 
     // Save to Chrome storage
     chrome.storage.local.set({ [`usabilityTest`]: testDetails }, () => {
-      console.log(`Stored usability test: ${message.taskId}`);
+      log(`Stored usability test: ${message.taskId}`);
     });
 
     sendResponse({ status: "success", message: `Usability test started for ${message.taskId}` });
-  } catch (error) {
-    console.error("Error starting usability test:", error);
-    sendResponse({ status: "error", message: error.message });
+  } catch (err) {
+    error("Error starting usability test:", err);
+    sendResponse({ status: "error", message: err.message });
   }
   return true;
 }
@@ -210,11 +216,11 @@ async function handleStartUsabilityTest(message, sendResponse) {
 async function handleEndUsabilityTest(message, sendResponse) {
   try {
     await chrome.storage.local.set({ trackingEnabled: false }, () => {
-      console.log("User interaction tracking stopped.");
+      log("User interaction tracking stopped.");
     });
 
     await chrome.storage.local.set({ trackingEnabled: false, userActions: [] }, () => {
-      console.log("User interaction tracking stopped. Cleared stored interactions.");
+      log("User interaction tracking stopped. Cleared stored interactions.");
     });
 
     await chrome.storage.local.set({ trackingEnabled: false, userActions: [] });
@@ -229,6 +235,16 @@ async function handleEndUsabilityTest(message, sendResponse) {
 
     sendTestResultsToTargetTab(testResults);
 
+    const response = await fetch("http://localhost/api/usability-test-results ", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Herbie-Version': chrome.runtime.getManifest()?.version || '2.2',
+                    'X-Request-Source': 'herbie-extension'
+                },
+                body: JSON.stringify(testResults),
+    });
+
     // Clear verification statements
     for (const key in verifyStmpts) {
       if (Object.prototype.hasOwnProperty.call(verifyStmpts, key)) {
@@ -237,20 +253,20 @@ async function handleEndUsabilityTest(message, sendResponse) {
     }
 
     sendResponse({ status: "Test results processed and sent." });
-  } catch (error) {
-    console.error("Error ending usability test:", error);
-    sendResponse({ status: "error", message: error.message });
+  } catch (err) {
+    error("Error ending usability test:", err);
+    sendResponse({ status: "error", message: err.message });
   }
   return true;
 }
 
 async function handleSetupUsabilityObservers(message, sendResponse) {
   try {
-    console.log("Setting up usability observers specifically");
+    log("Setting up usability observers specifically");
 
     // Parse the script for this specific URL
     const result = await ParseScript(message.herbieScript, message.url);
-    console.log("Parsed usability script:", result);
+    log("Parsed usability script:", result);
 
     // Send to content script with a specific action for usability
     chrome.tabs.sendMessage(sender.tab.id, {
@@ -260,9 +276,9 @@ async function handleSetupUsabilityObservers(message, sendResponse) {
     });
 
     sendResponse({ status: 'success', message: 'Usability observers setup initiated' });
-  } catch (error) {
-    console.error("Error setting up usability observers:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error setting up usability observers:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -271,7 +287,7 @@ async function handleSetObserver(message, sendResponse) {
   try {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs.length === 0 || !tabs[0].id) {
-      console.error("No active tab found");
+      error("No active tab found");
       sendResponse({ status: 'error', message: 'No active tab found' });
       return false;
     }
@@ -280,7 +296,7 @@ async function handleSetObserver(message, sendResponse) {
     const currentUrl = tabs.length > 0 ? tabs[0].url : '';
 
     const result = await ParseScript(message.herbie_script, currentUrl);
-    console.log("Parsed script for observer:", result);
+    log("Parsed script for observer:", result);
 
     chrome.tabs.sendMessage(activeTabId, {
       action: 'setObserver',
@@ -288,9 +304,9 @@ async function handleSetObserver(message, sendResponse) {
     });
 
     sendResponse({ status: 'success' });
-  } catch (error) {
-    console.error("Error setting observer:", error);
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    error("Error setting observer:", err);
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -335,13 +351,13 @@ function handleStartInspection(message, sendResponse) {
         { action: 'enableInspector' },
         (response) => {
           if (chrome.runtime.lastError) {
-            console.error("Error communicating with content script:", chrome.runtime.lastError.message);
+            error("Error communicating with content script:", chrome.runtime.lastError.message);
             sendResponse({
               status: 'error',
               message: 'Failed to enable inspector: ' + chrome.runtime.lastError.message
             });
           } else {
-            console.log('Response from content script:', response);
+            log('Response from content script:', response);
             sendResponse(response);
           }
         }
@@ -357,7 +373,7 @@ function handleStartInspection(message, sendResponse) {
 function handleXPathCaptured(message, sendResponse) {
   // Store the captured XPath in chrome.storage.local
   chrome.storage.local.set({ capturedXPath: message.xpath }, () => {
-    console.log('XPath stored in storage:', message.xpath);
+    log('XPath stored in storage:', message.xpath);
 
     // Forward the message to the popup if it's open
     chrome.runtime.sendMessage({
@@ -391,8 +407,8 @@ async function handleSetInjectionState(message, sendResponse) {
       }
     });
     sendResponse({ status: 'success', message: 'Injection state saved' });
-  } catch (error) {
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -401,8 +417,8 @@ async function handleClearInjectionState(message, sendResponse) {
   try {
     await chrome.storage.local.remove(['injectedComponent']);
     sendResponse({ status: 'success', message: 'Injection state cleared' });
-  } catch (error) {
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -414,8 +430,8 @@ async function handleGetInjectionState(message, sendResponse) {
       status: 'success',
       data: result.injectedComponent || null
     });
-  } catch (error) {
-    sendResponse({ status: 'error', message: error.message });
+  } catch (err) {
+    sendResponse({ status: 'error', message: err.message });
   }
   return true;
 }
@@ -424,7 +440,7 @@ async function handleGetInjectionState(message, sendResponse) {
 // LEGACY HANDLERS
 // ============================================================================
 function handleExecuteScriptFromInject(message, sendResponse) {
-  console.log("Hi from injected herbie");
+  log("Hi from injected herbie");
   sendResponse({ status: "Hi from bg" });
   return true;
 }
@@ -440,12 +456,12 @@ function sendTestResultsToTargetTab(testResults) {
           action: "updateUsabilityResults",
           data: testResults
         }, (response) => {
-          console.log("Sent test results to tab titled:", tab.title, response);
+          log("Sent test results to tab titled:", tab.title, response);
         });
         return; // Stop after finding the first matching tab
       }
     }
-    console.log("No active tab found with 'Usability Testing' in the title");
+    log("No active tab found with 'Usability Testing' in the title");
   });
 }
 
@@ -453,14 +469,14 @@ function sendTestResultsToTargetTab(testResults) {
 // NAVIGATION LISTENERS
 // ============================================================================
 chrome.webNavigation.onDOMContentLoaded.addListener((details) => {
-  console.log("\nNavigating to :" + details.url + "\n");
-  console.log("Current line:", line);
+  log("\nNavigating to :" + details.url + "\n");
+  log("Current line:", line);
 });
 
 // Enhanced navigation listener for component re-injection
 chrome.webNavigation.onDOMContentLoaded.addListener(async (details) => {
-  console.log("\nNavigating to :" + details.url + "\n");
-  console.log("Current line:", line);
+  log("\nNavigating to :" + details.url + "\n");
+  log("Current line:", line);
 
   // Only handle main frame navigations (not iframes)
   if (details.frameId === 0) {
@@ -472,25 +488,25 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async (details) => {
 // ============================================================================
 // COMPONENT REINJECTION FUNCTIONALITY
 // ============================================================================
-async function handleComponentReinjection(tabId, url) {
+async function handleComponentReinjection(tabId, url) {å
   try {
     // Get injection state from storage
     const result = await chrome.storage.local.get(['injectedComponent']);
 
     if (result.injectedComponent && result.injectedComponent.isActive) {
-      console.log('Found active injection, re-injecting on new page:', url);
+      log('Found active injection, re-injecting on new page:', url);
 
       // Import and use the re-injection function
       try {
         const { checkAndReinject } = await import('../utils/injectComponent.js');
         await checkAndReinject(tabId);
       } catch (importError) {
-        console.error('Error importing injection utilities, using fallback:', importError);
+        error('Error importing injection utilities, using fallback:', importError);
         await reinjeetComponentDirect(tabId);
       }
     }
-  } catch (error) {
-    console.error('Error during component re-injection:', error);
+  } catch (err) {
+    error('Error during component re-injection:', err);
   }
 }
 
@@ -502,7 +518,7 @@ async function reinjeetComponentDirect(tabId) {
     if (result.injectedComponent && result.injectedComponent.isActive) {
       const { componentName, scriptPath, cssPath, props, mountId } = result.injectedComponent;
 
-      console.log('Re-injecting component on new page...');
+      log('Re-injecting component on new page...');
 
       // Wait a bit for page to be ready
       setTimeout(async () => {
@@ -556,13 +572,50 @@ async function reinjeetComponentDirect(tabId) {
             },
             args: [mountId, componentName, props]
           });
-        } catch (error) {
-          console.error('Error during re-injection:', error);
+        } catch (err) {
+          error('Error during re-injection:', err);
         }
       }, 1500); // 1.5 second delay to ensure page is loaded
     }
-  } catch (error) {
-    console.error('Error checking for re-injection:', error);
+  } catch (err) {
+    error('Error checking for re-injection:', err);
   }
 }
 
+
+async function handleSetTesterName(message, sendResponse) {
+  try {
+    const { testerName } = message;
+    
+    // Store tester name persistently
+    await chrome.storage.local.set({ 
+      persistentTesterName: testerName,
+      testerNameLastUpdated: Date.now()
+    });
+    
+    console.log(`Stored tester name: ${testerName}`);
+    sendResponse({ status: 'success', message: 'Tester name saved' });
+  } catch (error) {
+    console.error("Error storing tester name:", error);
+    sendResponse({ status: 'error', message: error.message });
+  }
+  return true;
+}
+
+async function handleGetTesterName(message, sendResponse) {
+  try {
+    const result = await chrome.storage.local.get(['persistentTesterName', 'testerNameLastUpdated']);
+    
+    sendResponse({ 
+      status: 'success', 
+      data: {
+        testerName: result.persistentTesterName || null,
+        lastUpdated: result.testerNameLastUpdated || null
+      }
+    });
+  } catch (error) {
+    console.error("Error retrieving tester name:", error);
+    sendResponse({ status: 'error', message: error.message });
+  }
+  return true;
+}
