@@ -1,6 +1,6 @@
 ## Herbie
 
-Task Name: Locate and access the Organizational Chart section from the main menu.
+Webchart Select Patient Task
 
 ## Description
 
