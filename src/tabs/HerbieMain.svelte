@@ -205,9 +205,9 @@
           on:input={saveScriptContent}
         ></textarea>
       </div>
-
+    
       <!-- Command Bar -->
-      <div class="herbie_bar">
+      <!-- <div class="herbie_bar">
         <label for="herbie_command">Command:</label>
         <input
           id="herbie_command"
@@ -230,7 +230,8 @@
             <i class="fas fa-save"></i> Save
           </button>
         </div>
-      </div>
+      </div> -->
+     
 
       <!-- Log Component -->
       <LogComponent {logs} />
