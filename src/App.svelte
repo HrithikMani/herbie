@@ -9,6 +9,7 @@
 	import UsabilityTesting from './tabs/UsabilityTesting.svelte';
     import InjectHerbie from './tabs/InjectHerbie.svelte';
   	import SettingsTab from './tabs/Settings.svelte';
+	import Pody from './tabs/Pody.svelte';
 	let activeTab = 'tab1'; // Default active tab
   
 	// Map activeTab to components
@@ -20,7 +21,8 @@
 	  tab5: RecordTab,
 	  tab6: UsabilityTesting,
 	  tab7:InjectHerbie,
-	  tab8:SettingsTab
+	  tab8:SettingsTab,
+	  tab9:Pody
 	};
   
 	// Reactive assignment to update CurrentTab

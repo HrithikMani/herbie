@@ -8,7 +8,7 @@
     { id: 'tab3', label: 'Saved Scripts' },
     { id: 'tab4', label: 'Keywords' },
     // { id: 'tab5', label: 'Record' },
-   
+    { id: 'tab9', label: 'Pody' },
     { id: 'tab2', label: 'Logs' },
     // { id: 'tab7', label: 'Inject Herbie' },
     { id: 'tab8', label: 'Settings' },
