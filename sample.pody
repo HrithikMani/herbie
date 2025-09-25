@@ -1,0 +1,25 @@
+# Sample PODY Configuration for Testing
+# This file demonstrates the syntax highlighting capabilities
+
+element_selectors:
+  # Basic element selectors
+  link: "//a[@href]|//span[@class='link-style']"
+  
+  button: "//button[not(@disabled)]|//input[@type='submit']"
+  
+  # Complex multi-line selector
+  input_field: |
+    //div/label{OKRA_TEXT_CLS}/following-sibling::input[not(@type='hidden')]|
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td//input[not(@disabled)]|
+    //form//input[contains(@placeholder, '{SEARCH_TEXT}') and not(@readonly)]
+  
+  dropdown: |
+    //select[not(@disabled)]|
+    //div[contains(@class, 'dropdown')]//option[text()='{OPTION_TEXT}']|
+    //label{OKRA_TEXT_CLS}/parent::div//select[not(@hidden)]
+
+# Variables used in selectors
+variables:
+  OKRA_TEXT_CLS: "contains(text(), '{OKRA_TEXT}')"
+  SEARCH_TEXT: "Search..."
+  OPTION_TEXT: "Select Option"

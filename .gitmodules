@@ -1,0 +1,3 @@
+[submodule "pody-language-server"]
+	path = pody-language-server
+	url = https://github.com/HrithikMani/pody-lsp.git

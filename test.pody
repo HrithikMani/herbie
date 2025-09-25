@@ -1,0 +1,62 @@
+# Web Element XPath Selectors Configuration
+# Elements defined here are intended to be used as native elements without referencing any custom pod
+
+element_selectors:
+  link: "//a|//span[@class='link']"
+    # Note: //span is commented out in original - model_browser.okra will have to continue to fail alone for now so other tests that this change broke will run successfully.
+
+  text: "//*"  # Looks for ANY tag, combined with a text match can be used to 'Verify exists "something" text'
+
+  field: |
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td[@class='value']//input[not(@type='hidden')]|
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td/input[not(@type='hidden')]|
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td[@class='value']//select[not(@type='hidden')]|
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td//select[not(@type='hidden')]|
+    //td[@class='field']{OKRA_TEXT_CLS}/following-sibling::td[@class='value']//textarea[not(@type='hidden')]|
+    //td{OKRA_TEXT_CLS}/following-sibling::td//textarea[not(@type='hidden')]
+
+  fieldlabel: "//td[@class='field']{OKRA_TEXT_CLS}"
+
+  labelledradio: "//label{OKRA_TEXT_CLS}/preceding-sibling::input[not(@type='hidden') and @type='radio']|//label{OKRA_TEXT_CLS}/input[not(@type='hidden') and @type='radio']"
+
+  checkbox: |
+    //span{OKRA_TEXT_CLS}/preceding-sibling::label/input[not(@type='hidden') and @type='checkbox']|
+    //span{OKRA_TEXT_CLS}/input[not(@type='hidden') and @type='checkbox']|
+    //input[not(@type='hidden') and @type='checkbox']/parent::label{OKRA_TEXT_CLS}|
+    //label{OKRA_TEXT_CLS}/preceding-sibling::input[not(@type='hidden') and @type='checkbox']|
+    //*{OKRA_TEXT_CLS}/input[not(@type='hidden') and not(@disabled) and @type='checkbox']|
+    //input[not(@type='hidden') and not(@disabled) and @type='checkbox']|@id|@name
+
+  minusbutton: |
+    //span{OKRA_TEXT_CLS}/preceding-sibling::input[not(@type='hidden') and @type='button' and @value='-']|
+    //a{OKRA_TEXT_CLS}/preceding-sibling::input[not(@type='hidden') and @type='button' and @value='-']|
+    //input[not(@type='hidden') and @type='button' and @value='-']
+
+  input: |
+    //div/span[contains(., '{OKRA_TEXT}')]/parent::div/parent::div/following-sibling::div//input[not(@type='hidden')]|
+    //label[contains(text(), '{OKRA_TEXT}')]/parent::div/following-sibling::div//input[not(@type='hidden')]|
+    //label[contains(text(), '{OKRA_TEXT}')]/following-sibling::div//input[not(@type='hidden')]|
+    //input[not(@type='hidden') and not(@type='submit') and not(@type='button') and not(@disabled)]|@id|@name|
+    //textarea[not(@type='hidden') and not(@readonly)]|@id|@name|
+    //td{OKRA_TEXT_CLS}/following-sibling::td//input[not(@type='hidden') and not(@disabled)]|
+    //td{OKRA_TEXT_CLS}/following-sibling::td//textarea[not(@type='hidden') and not(@disabled)]|
+    //body[contains(., 'portal')]//div/label{OKRA_TEXT_CLS}/parent::div/parent::div//input[not(@disabled)]|
+    //div/label{OKRA_TEXT_CLS}/parent::div//input[not(@disabled)]|
+    //div/label{OKRA_TEXT_CLS}/parent::div/parent::div//textarea[not(@type='hidden') and not(@readonly)]
+
+  dropdown: |
+    //div/span[contains(., '{OKRA_TEXT}')]/parent::div/parent::div/following-sibling::div//select[not(@type='hidden')]|
+    //div[contains(., '{OKRA_TEXT}')]/following-sibling::div//select[not(@type='hidden') and not(@disabled)]|
+    //div[contains(text(), '{OKRA_TEXT}')]/select[not(@type='hidden') and not(@disabled)]|
+    //div/label{OKRA_TEXT_CLS}/following-sibling::div/select[not(@disabled)]|
+    //div/label{OKRA_TEXT_CLS}/parent::div/parent::div//select[not(@disabled)]|
+    //td{OKRA_TEXT_CLS}/following-sibling::td//select[not(@disabled)]|
+    //select[not(@disabled)]|@id|@name
+
+  button: |
+    //a[@class='wc2button']|
+    //input[not(@type='hidden') and (@type='button' or @type='submit' or @type='SUBMIT') and not(@disabled)]|@value|
+    //button[not(@type='hidden') and not(@disabled)]{OKRA_TEXT_CLS}|
+    //button[not(@type='hidden') and not(@disabled)]
+
+  label: "//label|@id|@name|//label"
