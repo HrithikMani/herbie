@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
 
+  export let activeTab;
+
   // List of previously uploaded .pody files
   let podyFiles = [];
   let isUploading = false;
@@ -50,6 +52,32 @@
     };
     
     reader.readAsText(file);
+  }
+
+  // View a pody file - sends message to background script
+  function viewFile(file) {
+    console.log('Viewing PODY file:', file.name);
+    
+    // Send message to background script
+    chrome.runtime.sendMessage({
+      action: 'viewPodyFile',
+      data: {
+        fileName: file.name,
+        content: file.content,
+        timestamp: file.timestamp
+      }
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Chrome runtime error:', chrome.runtime.lastError);
+        return;
+      }
+      
+      if (response && response.status === 'success') {
+        console.log('Background script received PODY file data:', response.message);
+      } else {
+        console.error('Failed to send PODY file to background script:', response);
+      }
+    });
   }
 
   // Delete a pody file
@@ -121,7 +149,7 @@
               <span class="file-date">{new Date(file.timestamp).toLocaleDateString()}</span>
             </div>
             <div class="file-actions">
-              <button class="view-btn" on:click={() => alert('View functionality to be implemented')}>View</button>
+              <button class="view-btn" on:click={() => viewFile(file)}>View</button>
               <button class="delete-btn" on:click={() => deleteFile(index)}>Delete</button>
             </div>
           </li>

@@ -77,6 +77,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'getTesterName':
       return handleGetTesterName(message, sendResponse);
 
+    // PODY File Handling
+    case 'viewPodyFile':
+      return handleViewPodyFile(message, sendResponse);
+
     default:
       warn("Unhandled message action:", message.action);
       return false;
@@ -640,6 +644,55 @@ async function handleGetTesterName(message, sendResponse) {
   } catch (error) {
     console.error("Error retrieving tester name:", error);
     sendResponse({ status: 'error', message: error.message });
+  }
+  return true;
+}
+
+// ============================================================================
+// PODY FILE HANDLING
+// ============================================================================
+async function handleViewPodyFile(message, sendResponse) {
+  try {
+    log("Background received PODY file view request:", message.data.fileName);
+    
+    // Get active tab to send message to content scripts
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    if (!activeTab) {
+      throw new Error("No active tab found");
+    }
+    
+    try {
+      // Send message to PODY handler in active tab (should be already injected by content script guard)
+      await chrome.tabs.sendMessage(activeTab.id, {
+        action: 'viewPodyFile',
+        data: {
+          fileName: message.data.fileName,
+          content: message.data.content,
+          timestamp: message.data.timestamp
+        }
+      });
+      
+      log(`Sent PODY view message to active tab ${activeTab.id}`);
+      
+      sendResponse({ 
+        status: 'success', 
+        message: 'PODY file displayed in content script' 
+      });
+    } catch (messageError) {
+      error(`Failed to send message to PODY handler: ${messageError.message}`);
+      sendResponse({ 
+        status: 'error', 
+        message: `Content scripts may not be loaded on this page: ${messageError.message}` 
+      });
+    }
+    
+  } catch (error) {
+    error("Error handling PODY file view:", error);
+    sendResponse({ 
+      status: 'error', 
+      message: error.message 
+    });
   }
   return true;
 }

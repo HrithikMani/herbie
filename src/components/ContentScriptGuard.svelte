@@ -71,7 +71,8 @@
             "content-scripts/dragdrop.js",
             "content-scripts/usability_testing/usabilitytesting.js",
             "content-scripts/inspector.js",
-            "content-scripts/confetti.js"
+            "content-scripts/confetti.js",
+            "content-scripts/podyHandler.js"
           ],
           runAt: "document_idle"
         }
