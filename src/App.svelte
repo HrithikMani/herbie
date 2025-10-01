@@ -10,6 +10,7 @@
     import InjectHerbie from './tabs/InjectHerbie.svelte';
   	import SettingsTab from './tabs/Settings.svelte';
 	import Pody from './tabs/Pody.svelte';
+	import AxeRunner from './tabs/AxeRunner.svelte';
 	let activeTab = 'tab1'; // Default active tab
   
 	// Map activeTab to components
@@ -22,7 +23,8 @@
 	  tab6: UsabilityTesting,
 	  tab7:InjectHerbie,
 	  tab8:SettingsTab,
-	  tab9:Pody
+	  tab9:Pody,
+	  tab10:AxeRunner
 	};
   
 	// Reactive assignment to update CurrentTab

@@ -81,6 +81,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'viewPodyFile':
       return handleViewPodyFile(message, sendResponse);
 
+    // Accessibility Testing
+    case 'runAxeTest':
+      return handleRunAxeTest(message, sendResponse);
+
     default:
       warn("Unhandled message action:", message.action);
       return false;
@@ -692,6 +696,81 @@ async function handleViewPodyFile(message, sendResponse) {
     sendResponse({ 
       status: 'error', 
       message: error.message 
+    });
+  }
+  return true;
+}
+
+// ============================================================================
+// ACCESSIBILITY TESTING
+// ============================================================================
+async function handleRunAxeTest(message, sendResponse) {
+  try {
+    log("Background received Axe test request");
+    
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    
+    if (!activeTab) {
+      throw new Error("No active tab found");
+    }
+
+    // Check if it's a valid URL (not chrome://, chrome-extension://, etc.)
+    if (!activeTab.url || activeTab.url.startsWith('chrome://') || activeTab.url.startsWith('chrome-extension://') || activeTab.url.startsWith('moz-extension://')) {
+      throw new Error("Cannot run accessibility tests on chrome://, extension pages, or restricted URLs");
+    }
+    
+    log(`Sending Axe test message to tab ${activeTab.id} (${activeTab.url})`);
+    
+    // Send message with proper promise handling and timeout
+    const response = await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout: Content script did not respond within 30 seconds"));
+      }, 30000);
+
+      chrome.tabs.sendMessage(
+        activeTab.id, 
+        { action: 'runAxeTest' },
+        (response) => {
+          clearTimeout(timeout);
+          
+          if (chrome.runtime.lastError) {
+            reject(new Error(`Content script communication failed: ${chrome.runtime.lastError.message}`));
+          } else if (!response) {
+            reject(new Error("Content script returned empty response. Make sure axe-runner.js is properly injected."));
+          } else {
+            resolve(response);
+          }
+        }
+      );
+    });
+    
+    log(`Axe test completed successfully on tab ${activeTab.id}`, response);
+    
+    // Ensure we have the expected response structure
+    if (response.status === 'success' && response.data) {
+      sendResponse({ 
+        status: 'success', 
+        message: 'Axe test completed successfully',
+        data: response.data
+      });
+    } else {
+      throw new Error(response.message || "Unexpected response format from content script");
+    }
+    
+  } catch (error) {
+    error("Error handling Axe test:", error);
+    
+    // Provide more specific error messages
+    let errorMessage = error.message;
+    if (error.message.includes("Could not establish connection")) {
+      errorMessage = "Content scripts not loaded. Please enable content scripts in Settings and refresh the page.";
+    } else if (error.message.includes("port closed")) {
+      errorMessage = "Connection lost to content script. Please refresh the page and try again.";
+    }
+    
+    sendResponse({ 
+      status: 'error', 
+      message: errorMessage
     });
   }
   return true;

@@ -38,6 +38,7 @@
       {
         "resources": [
           "dist/mie-simulijs.js",
+          "dist/axe.min.js",
           "content-scripts/*.js",
           "content-scripts/usability_testing/*.js",
           "content-scripts/usability_testing/verification/*.js",

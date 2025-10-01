@@ -13,6 +13,7 @@
       matches: ["<all_urls>"],
       js: [
         "dist/mie-simulijs.js",
+        "dist/axe.min.js",
         "content-scripts/execute.js",
         "content-scripts/findelement.js",
         "content-scripts/usability_testing/verification/textVerification.js",
@@ -28,6 +29,7 @@
         "content-scripts/inspector.js",
         "content-scripts/confetti.js",
         "content-scripts/podyHandler.js",
+        "content-scripts/usability_testing/axe-runner.js",
       ],
       runAt: "document_idle"
     }
